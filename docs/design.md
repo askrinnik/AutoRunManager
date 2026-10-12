@@ -86,7 +86,7 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 2. Core model and pure helpers with tests: command-line → executable path, `StartupApproved` encode/decode, task name cleanup, service filter. **Done.**
 3. Read-only sources for group A and the prototype's tasks and services; compare the list with the prototype and Task Manager on the real machine. **Done** (checked with `--list`: Run32 and Store app entries appear; a task with doubled quotes around its program path is parsed).
 4. Read-only sources for group B. **Done.** Winlogon, BootExecute and AppInit_DLLs entries are listed only when they differ from the default and are never deleted.
-5. Actions: toggle, delete with backup; admin-rights detection per entry.
+5. Actions: toggle, delete with backup; admin-rights detection per entry. **Done.** Verified on the machine with test entries only (HKCU Run value, user Startup file, user task): toggle, delete, backup, restore of the `.reg` backup. Not verified on the machine: Store app toggle, service start type change, WMI deletion.
 6. WPF UI port of the prototype design; async loading.
 7. Elevation: disabled controls, "Restart as administrator".
 8. Manual check on the real machine with test entries only; publish script, icon, README.

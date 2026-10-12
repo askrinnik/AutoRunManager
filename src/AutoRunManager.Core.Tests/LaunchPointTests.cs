@@ -132,11 +132,6 @@ public class RegistryLaunchPointSourceTests
 
 public class WmiSubscriptionSourceTests
 {
-    private sealed class FakeWmi(params WmiSubscriptionInfo[] subscriptions) : IWmiSubscriptions
-    {
-        public IReadOnlyList<WmiSubscriptionInfo> GetSubscriptions() => subscriptions;
-    }
-
     [Fact]
     public void Enumerate_MapsCommandLineAndScriptConsumers()
     {

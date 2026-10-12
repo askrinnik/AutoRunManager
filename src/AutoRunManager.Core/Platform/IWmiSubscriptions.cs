@@ -18,6 +18,9 @@ public sealed record WmiSubscriptionInfo(
 public interface IWmiSubscriptions
 {
     IReadOnlyList<WmiSubscriptionInfo> GetSubscriptions();
+
+    /// <summary>Deletes the binding, then the consumer and the filter (needs admin rights).</summary>
+    void Delete(string bindingPath, string consumerPath, string filterPath);
 }
 
 public sealed class WmiSubscriptions : IWmiSubscriptions
@@ -72,5 +75,15 @@ public sealed class WmiSubscriptions : IWmiSubscriptions
         }
 
         return result;
+    }
+
+    public void Delete(string bindingPath, string consumerPath, string filterPath)
+    {
+        ManagementScope scope = new(Namespace);
+        foreach (string path in (string[])[bindingPath, consumerPath, filterPath])
+        {
+            using ManagementObject instance = new(scope, new ManagementPath(path), null);
+            instance.Delete();
+        }
     }
 }

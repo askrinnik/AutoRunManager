@@ -17,6 +17,26 @@ public sealed class ComTaskScheduler : ITaskScheduler
         return tasks;
     }
 
+    public void SetEnabled(string taskPath, bool enabled)
+    {
+        dynamic task = GetTask(taskPath);
+        task.Enabled = enabled;
+    }
+
+    public string GetXml(string taskPath) => (string)GetTask(taskPath).Xml;
+
+    public void Delete(string taskPath)
+    {
+        (string folder, string name) = Parsing.TaskNames.Split(taskPath);
+        Connect().GetFolder(folder).DeleteTask(name, 0);
+    }
+
+    private static dynamic GetTask(string taskPath)
+    {
+        (string folder, string name) = Parsing.TaskNames.Split(taskPath);
+        return Connect().GetFolder(folder).GetTask(name);
+    }
+
     internal static dynamic Connect()
     {
         Type type = Type.GetTypeFromProgID("Schedule.Service", throwOnError: true)!;

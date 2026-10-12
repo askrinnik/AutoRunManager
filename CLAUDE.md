@@ -21,7 +21,8 @@ src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --list <file.tsv
 - `src/AutoRunManager.Core`: no UI.
   - `Model/`: `StartupEntry`, `EntryKind` (+ group and display name), `EntryLocator` subtypes that identify where an entry is defined.
   - `Parsing/`: pure helpers: `CommandLine` (command → program path), `StartupApprovedValue`, `TaskNames`, `ServiceRules` (listing filter, start modes, off/on policy), `PackagedStartupTasks` (manifest parsing, `State` values), `LaunchPointRules` (defaults of Winlogon and BootExecute).
-  - `Platform/`: thin wrappers: `IRegistry` (64-bit view, raw values), `IFileSystem`, `ITaskScheduler` (COM `Schedule.Service`), `IIndirectStrings` (`SHLoadIndirectString`), `IWmiSubscriptions` (System.Management), `SystemContext` (folders, current user).
+  - `Platform/`: thin wrappers: `IRegistry` (64-bit view, raw values), `IFileSystem`, `ITaskScheduler` (COM `Schedule.Service`), `IIndirectStrings` (`SHLoadIndirectString`), `IWmiSubscriptions` (System.Management), `IServiceControl` (`ChangeServiceConfig`), `Elevation`, `SystemContext` (folders, current user).
+  - `Actions/`: `EntryActions` (toggle per location; delete after a backup), `BackupStore` (`%LOCALAPPDATA%\AutoRunManager\backups`: `.reg`, file copy, task XML, text), `RegFile` (regedit export format, UTF-16), `AppState` (`state.json`: saved service start modes).
   - `Sources/`: one `IEntrySource` per location (`RunKeySource`, `StartupFolderSource`, `PackagedAppSource`, `ScheduledTaskSource`, `ServiceSource`, `RegistryLaunchPointSource` for all group B registry locations, `WmiSubscriptionSource`); `EntryCollector` runs them and reports failing sources.
 - `src/AutoRunManager`: WinExe, WPF. `Themes/` (colors and control templates in XAML), main window, dialogs. Manifest `asInvoker`.
 - `src/AutoRunManager.Core.Tests`: xUnit tests with fake platform interfaces.
@@ -30,6 +31,7 @@ src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --list <file.tsv
 ## Conventions
 
 - All projects target `net10.0-windows`. Shared settings live in `src/Directory.Build.props` (nullable, implicit usings, `TreatWarningsAsErrors`).
+- Core uses built-in COM (`dynamic` Task Scheduler) and WMI: never publish trimmed or AOT. File-based test scripts (`dotnet run x.cs`) need `#:property TargetFramework=net10.0-windows` and `#:property PublishAot=false`.
 - Keep decision and parsing logic in pure classes in Core with unit tests; keep registry, COM and P/Invoke code thin and separate.
 - Never block the UI thread with data collection.
 - UI text in English. Code, comments, commit messages and repository docs in English. Talk to the user in Russian.
@@ -39,6 +41,7 @@ src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --list <file.tsv
 Unit tests use fakes. Reading real autostart locations is safe and can be done freely. Changing them is not:
 
 - Test toggle and delete only on entries created for the test (e.g. a value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` pointing at `notepad.exe`), and remove them afterwards.
+- Claude Code on this machine runs elevated (`Elevation.IsElevated()` is true), so HKLM writes succeed from Claude's processes; be careful, and ask the user to check the non-elevated behavior.
 - Report what was verified on the machine and what only in tests.
 
 ## Do not

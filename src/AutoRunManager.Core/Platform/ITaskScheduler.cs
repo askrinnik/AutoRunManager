@@ -20,4 +20,11 @@ public interface ITaskScheduler
 {
     /// <summary>All tasks, including hidden ones, in folders accepted by <paramref name="includeFolder"/>.</summary>
     IReadOnlyList<ScheduledTaskInfo> GetTasks(Func<string, bool> includeFolder);
+
+    void SetEnabled(string taskPath, bool enabled);
+
+    /// <summary>The task definition as XML, importable with <c>schtasks /create /xml</c>.</summary>
+    string GetXml(string taskPath);
+
+    void Delete(string taskPath);
 }

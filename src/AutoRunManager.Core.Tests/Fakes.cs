@@ -102,6 +102,19 @@ internal sealed class FakeFileSystem : IFileSystem
     public bool FileExists(string path) => Files.ContainsKey(path);
 
     public string? ReadAllText(string path) => Files.TryGetValue(path, out string? text) ? text : null;
+
+    public Dictionary<string, System.Text.Encoding?> Encodings { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public void WriteAllText(string path, string text, System.Text.Encoding? encoding = null)
+    {
+        Files[path] = text;
+        Encodings[path] = encoding;
+    }
+
+    public void Copy(string source, string target) =>
+        Files[target] = Files.TryGetValue(source, out string? text) ? text : throw new FileNotFoundException(source);
+
+    public void Delete(string path) => Files.Remove(path);
 }
 
 internal sealed class FakeTaskScheduler(params ScheduledTaskInfo[] tasks) : ITaskScheduler
@@ -123,6 +136,16 @@ internal sealed class FakeTaskScheduler(params ScheduledTaskInfo[] tasks) : ITas
 
         return result;
     }
+
+    public Dictionary<string, bool> EnabledChanges { get; } = [];
+
+    public List<string> Deleted { get; } = [];
+
+    public void SetEnabled(string taskPath, bool enabled) => EnabledChanges[taskPath] = enabled;
+
+    public string GetXml(string taskPath) => $"<Task path=\"{taskPath}\" />";
+
+    public void Delete(string taskPath) => Deleted.Add(taskPath);
 }
 
 internal sealed class FakeIndirectStrings(Dictionary<string, string>? known = null) : IIndirectStrings
@@ -144,4 +167,27 @@ internal static class TestContext
         @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup",
         @"PC\me",
         "S-1-5-21-1-2-3-1001");
+}
+
+internal sealed class FakeWmi(params WmiSubscriptionInfo[] subscriptions) : IWmiSubscriptions
+{
+    public List<string[]> Deleted { get; } = [];
+
+    public IReadOnlyList<WmiSubscriptionInfo> GetSubscriptions() => subscriptions;
+
+    public void Delete(string bindingPath, string consumerPath, string filterPath) => Deleted.Add([bindingPath, consumerPath, filterPath]);
+}
+
+internal sealed class FakeServiceControl : IServiceControl
+{
+    public List<(string Name, Parsing.ServiceStartMode Mode)> Changes { get; } = [];
+
+    public void SetStartMode(string serviceName, Parsing.ServiceStartMode mode) => Changes.Add((serviceName, mode));
+}
+
+internal sealed class FixedTime(DateTimeOffset now) : TimeProvider
+{
+    public override DateTimeOffset GetUtcNow() => now;
+
+    public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.Utc;
 }

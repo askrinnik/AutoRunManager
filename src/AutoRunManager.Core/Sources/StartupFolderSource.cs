@@ -42,7 +42,7 @@ public sealed class StartupFolderSource(IRegistry registry, IFileSystem fileSyst
     }
 
     /// <summary>The hive whose <c>StartupApproved\StartupFolder</c> key holds the state of a file.</summary>
-    public RegistryHive ApprovedHiveFor(FileLocator locator) =>
+    public static RegistryHive ApprovedHiveFor(SystemContext context, FileLocator locator) =>
         IsIn(locator.Path, context.CommonStartupFolder) ? RegistryHive.LocalMachine : RegistryHive.CurrentUser;
 
     private IEnumerable<(string Folder, RegistryHive Hive)> Folders()

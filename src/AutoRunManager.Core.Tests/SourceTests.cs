@@ -100,8 +100,8 @@ public class StartupFolderSourceTests
 
         Assert.Equal(EntryState.Disabled, states["a"]);
         Assert.Equal(EntryState.Enabled, states["b"]);
-        Assert.Equal(RegistryHive.LocalMachine, source.ApprovedHiveFor(new FileLocator(Context.CommonStartupFolder + @"\b.lnk")));
-        Assert.Equal(RegistryHive.CurrentUser, source.ApprovedHiveFor(new FileLocator(Context.UserStartupFolder + @"\a.lnk")));
+        Assert.Equal(RegistryHive.LocalMachine, StartupFolderSource.ApprovedHiveFor(Context, new FileLocator(Context.CommonStartupFolder + @"\b.lnk")));
+        Assert.Equal(RegistryHive.CurrentUser, StartupFolderSource.ApprovedHiveFor(Context, new FileLocator(Context.UserStartupFolder + @"\a.lnk")));
     }
 }
 
