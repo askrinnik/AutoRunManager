@@ -20,9 +20,9 @@ src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --list <file.tsv
 
 - `src/AutoRunManager.Core`: no UI.
   - `Model/`: `StartupEntry`, `EntryKind` (+ group and display name), `EntryLocator` subtypes that identify where an entry is defined.
-  - `Parsing/`: pure helpers: `CommandLine` (command → program path), `StartupApprovedValue`, `TaskNames`, `ServiceRules` (listing filter, start modes, off/on policy), `PackagedStartupTasks` (manifest parsing, `State` values).
-  - `Platform/`: thin wrappers: `IRegistry` (64-bit view, raw values), `IFileSystem`, `ITaskScheduler` (COM `Schedule.Service`), `IIndirectStrings` (`SHLoadIndirectString`), `SystemContext` (folders, current user).
-  - `Sources/`: one `IEntrySource` per location (`RunKeySource`, `StartupFolderSource`, `PackagedAppSource`, `ScheduledTaskSource`, `ServiceSource`); `EntryCollector` runs them and reports failing sources.
+  - `Parsing/`: pure helpers: `CommandLine` (command → program path), `StartupApprovedValue`, `TaskNames`, `ServiceRules` (listing filter, start modes, off/on policy), `PackagedStartupTasks` (manifest parsing, `State` values), `LaunchPointRules` (defaults of Winlogon and BootExecute).
+  - `Platform/`: thin wrappers: `IRegistry` (64-bit view, raw values), `IFileSystem`, `ITaskScheduler` (COM `Schedule.Service`), `IIndirectStrings` (`SHLoadIndirectString`), `IWmiSubscriptions` (System.Management), `SystemContext` (folders, current user).
+  - `Sources/`: one `IEntrySource` per location (`RunKeySource`, `StartupFolderSource`, `PackagedAppSource`, `ScheduledTaskSource`, `ServiceSource`, `RegistryLaunchPointSource` for all group B registry locations, `WmiSubscriptionSource`); `EntryCollector` runs them and reports failing sources.
 - `src/AutoRunManager`: WinExe, WPF. `Themes/` (colors and control templates in XAML), main window, dialogs. Manifest `asInvoker`.
 - `src/AutoRunManager.Core.Tests`: xUnit tests with fake platform interfaces.
 - `prototype/AutoRun.Resources.AutoRun.ps1`: working PowerShell/WPF prototype. Reference for look and behavior; not built or shipped.

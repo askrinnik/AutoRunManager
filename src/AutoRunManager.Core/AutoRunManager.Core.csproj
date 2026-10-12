@@ -10,4 +10,8 @@
     <InternalsVisibleTo Include="AutoRunManager.Core.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="10.0.12" />
+  </ItemGroup>
+
 </Project>

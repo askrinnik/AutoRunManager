@@ -21,6 +21,8 @@ public sealed class EntryCollector(IReadOnlyList<IEntrySource> sources)
             new PackagedAppSource(registry, fileSystem, strings),
             new ScheduledTaskSource(new ComTaskScheduler(), registry, context),
             new ServiceSource(registry, strings, context),
+            new RegistryLaunchPointSource(registry, context),
+            new WmiSubscriptionSource(new WmiSubscriptions()),
         ]);
     }
 
