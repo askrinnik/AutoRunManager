@@ -69,7 +69,7 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 ## Design decisions
 
 - WPF, not WinForms: the prototype is WPF, and its templates (toggle, button, fades) port directly to XAML.
-- Window layout: tabs with entry counts (Apps: Run keys, Startup folders, Store apps; Tasks; Services; Advanced: the rest of group B), a search box and a filter (All, On, Off, Needs admin) under the tabs, entries grouped into sections per location inside a tab. Fixed height (650) so switching tabs does not resize the window.
+- Window layout: tabs with entry counts (Apps: Run keys, Startup folders, Store apps; Tasks; Services; Advanced: the rest of group B), a search box and a filter (All, On, Off, Needs admin) under the tabs, entries grouped into sections per location inside a tab. Opens at 600×650 so switching tabs does not resize it; resizable from every edge (WindowChrome), minimum 480×360.
 - `src/AutoRunManager.Core` holds the model, pure parsing helpers and one source class per location behind thin platform interfaces (registry, file system, Task Scheduler COM, Service Control Manager P/Invoke). Pure parts are unit-tested with fakes.
 - Group B entries without a native toggle are read-only (open location, delete with backup). Turning them off through a store of our own (as Autoruns does with its `AutorunsDisabled` keys) may come later.
 - Services: "off" sets `Manual`, not `Disabled`, so apps that start their service on demand keep working. The previous start type is saved in `%LOCALAPPDATA%\AutoRunManager\state.json` and restored by "on".

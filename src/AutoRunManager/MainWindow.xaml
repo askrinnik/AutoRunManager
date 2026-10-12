@@ -8,8 +8,14 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        ResizeMode="CanMinimize"
+        ResizeMode="CanResize"
+        MinWidth="480"
+        MinHeight="360"
         WindowStartupLocation="CenterScreen">
+    <!-- Borderless but resizable from every edge; the header is the drag handle. -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="6" CornerRadius="15" GlassFrameThickness="0" UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
@@ -37,7 +43,7 @@
                         </TextBlock>
                         <TextBlock Text="{Binding PathText}" Style="{StaticResource LinkText}" Foreground="{StaticResource SecondaryTextBrush}"
                                    FontFamily="{StaticResource PathFont}" FontSize="11" Margin="0,5,0,0" HorizontalAlignment="Left"
-                                   TextTrimming="CharacterEllipsis" MaxWidth="390" ToolTip="{Binding Entry.Command}">
+                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Entry.Command}">
                             <TextBlock.InputBindings>
                                 <MouseBinding Gesture="LeftClick" Command="{Binding ShowFileCommand}" />
                             </TextBlock.InputBindings>
