@@ -14,7 +14,7 @@ namespace AutoRunManager.Core.Actions;
 /// </summary>
 public sealed class BackupStore(IFileSystem fileSystem, string folder, TimeProvider time)
 {
-    public static string DefaultFolder => Path.Combine(AppState.DefaultFolder, "backups");
+    public static string DefaultFolder => Path.Combine(AppState.DefaultFolder, "Backups");
 
     public string Folder => folder;
 

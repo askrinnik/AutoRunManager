@@ -121,7 +121,17 @@ public class EntryActionsTests
             AppState.Load(_files, StatePath), new BackupStore(_files, BackupFolder, new FixedTime(Now)), new FixedTime(Now));
 
         Assert.Throws<Win32Exception>(() => actions.SetEnabled(Entry(EntryKind.Service, new ServiceLocator("svc"), canDelete: false), false));
-        Assert.False(_files.FileExists(StatePath));
+        Assert.Empty(AppState.Load(_files, StatePath).ServiceStartModes);
+    }
+
+    [Fact]
+    public void SetEnabled_ServiceOffWithUnwritableState_LeavesServiceUnchanged()
+    {
+        _registry.Set(RegistryHive.LocalMachine, $@"{ServiceSource.ServicesKey}\svc", "Start", 2);
+        _files.ReadOnly = true;
+
+        Assert.Throws<UnauthorizedAccessException>(() => Actions().SetEnabled(Entry(EntryKind.Service, new ServiceLocator("svc"), canDelete: false), false));
+        Assert.Empty(_services.Changes);
     }
 
     [Fact]

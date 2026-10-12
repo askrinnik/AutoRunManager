@@ -143,12 +143,26 @@ public sealed class EntryActions(
             return;
         }
 
+        // Save the mode first: if the state file cannot be written (portable app in a read-only
+        // folder), the service is left unchanged instead of losing its start type.
         ServiceStartMode current = ServiceSource.ReadStartMode(registry, serviceName);
-        services.SetStartMode(serviceName, ServiceRules.OffMode);
-        if (current.IsAutoStart)
+        if (!current.IsAutoStart)
         {
-            state.ServiceStartModes[serviceName] = current;
+            services.SetStartMode(serviceName, ServiceRules.OffMode);
+            return;
+        }
+
+        state.ServiceStartModes[serviceName] = current;
+        state.Save();
+        try
+        {
+            services.SetStartMode(serviceName, ServiceRules.OffMode);
+        }
+        catch
+        {
+            state.ServiceStartModes.Remove(serviceName);
             state.Save();
+            throw;
         }
     }
 

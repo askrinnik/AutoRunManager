@@ -8,7 +8,8 @@
     and WMI.
 
     With -InstallDir the executable is copied into that folder; a running copy is stopped first.
-    State and backups live in %LOCALAPPDATA%\AutoRunManager and are left untouched.
+    The app is portable: AutoRunManager.state.json and the Backups folder live next to the
+    executable and are left untouched. The folder must be writable, so not Program Files.
 
 .EXAMPLE
     .\tools\publish.ps1
@@ -37,6 +38,11 @@ $exe = Join-Path $publishDir 'AutoRunManager.exe'
 if (-not $InstallDir) { return }
 
 $InstallDir = [IO.Path]::GetFullPath($InstallDir)
+if ($InstallDir.StartsWith($env:ProgramFiles, 'OrdinalIgnoreCase') -or
+    ($env:ProgramW6432 -and $InstallDir.StartsWith($env:ProgramW6432, 'OrdinalIgnoreCase')) -or
+    (${env:ProgramFiles(x86)} -and $InstallDir.StartsWith(${env:ProgramFiles(x86)}, 'OrdinalIgnoreCase'))) {
+    throw "Program Files is not writable without admin rights; the portable app keeps its state and backups next to the exe."
+}
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 $target = Join-Path $InstallDir 'AutoRunManager.exe'
 

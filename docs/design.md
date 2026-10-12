@@ -12,7 +12,7 @@ A WPF app (.NET 10) that shows every place where Windows 11 starts apps and serv
 4. Data is collected off the UI thread; the window never freezes while loading.
 5. Toggle and delete per entry; clicking a category header toggles all its entries after confirmation.
 6. Services can be turned off (`Manual`) and on (previous start type), never deleted.
-7. Before deleting an entry, its definition is saved to a backup in `%LOCALAPPDATA%\AutoRunManager\backups`.
+7. Before deleting an entry, its definition is saved to a backup in the `Backups` folder next to the executable (the app is portable).
 8. No links to the prototype author's social accounts.
 
 ## Autostart locations
@@ -69,10 +69,11 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 ## Design decisions
 
 - WPF, not WinForms: the prototype is WPF, and its templates (toggle, button, fades) port directly to XAML.
-- Window layout: side navigation instead of tabs (groups Apps, Tasks, Services, Advanced with counts; sections of multi-kind groups below them; a group shows all its sections). Search and filter above the cards; non-empty search covers all groups. Resizable from every edge (WindowChrome), default 820×650, minimum 600×360; position and size saved in `state.json` and restored when still on screen.
+- Window layout: side navigation instead of tabs (groups Apps, Tasks, Services, Advanced with counts; sections of multi-kind groups below them; a group shows all its sections). Search and filter above the cards; non-empty search covers all groups. Resizable from every edge (WindowChrome), default 820×650, minimum 600×360; position and size saved in `AutoRunManager.state.json` and restored when still on screen.
 - `src/AutoRunManager.Core` holds the model, pure parsing helpers and one source class per location behind thin platform interfaces (registry, file system, Task Scheduler COM, Service Control Manager P/Invoke). Pure parts are unit-tested with fakes.
 - Group B entries without a native toggle are read-only (open location, delete with backup). Turning them off through a store of our own (as Autoruns does with its `AutorunsDisabled` keys) may come later.
-- Services: "off" sets `Manual`, not `Disabled`, so apps that start their service on demand keep working. The previous start type is saved in `%LOCALAPPDATA%\AutoRunManager\state.json` and restored by "on".
+- Services: "off" sets `Manual`, not `Disabled`, so apps that start their service on demand keep working. The previous start type is saved in `AutoRunManager.state.json` and restored by "on"; it is saved before the service is changed, so an unwritable state file leaves the service as it was.
+- Portable: all files the app writes (`AutoRunManager.state.json`, `Backups`) live next to the executable (`AppContext.BaseDirectory`), as in BtVolumeGuard. Nothing goes to `%LOCALAPPDATA%` or the registry, except the `LastKey` value regedit itself uses for "open at key".
 - `src/AutoRunManager` is the WPF shell: XAML themes, view models, dialogs, icon loading, shell launching, elevation.
 
 ## Open questions

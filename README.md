@@ -10,7 +10,7 @@ It is a C# port of a PowerShell/WPF script (`prototype/`), keeping its look and 
 - Click a name to open where the entry is defined (regedit at the key, Explorer, Task Scheduler, Services, Settings → Startup apps). Click the path to show the program in Explorer.
 - The switch turns an entry off and on the way Windows does (`StartupApproved`, Store app state, task enabled flag). Services are set to Manual when off and get their previous start type back when on.
 - Entries marked "read-only" have no switch in Windows; they can only be deleted.
-- Delete saves a backup first in `%LOCALAPPDATA%\AutoRunManager\backups`: a `.reg` file (double-click to restore), the Startup folder file, or the task XML (`schtasks /create /xml <file> /tn <name>`).
+- Delete saves a backup first in the `Backups` folder next to the exe: a `.reg` file (double-click to restore), the Startup folder file, or the task XML (`schtasks /create /xml <file> /tn <name>`).
 - Click a section header to turn all its entries off or on (asks first).
 - Without admin rights, machine-wide entries, services and tasks of other users are locked; "Restart as admin" restarts the app elevated.
 
@@ -26,7 +26,7 @@ dotnet run --project src/AutoRunManager
 
 ## Install
 
-The app is a single `AutoRunManager.exe` (framework-dependent, needs the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)).
+The app is a single `AutoRunManager.exe` (framework-dependent, needs the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)). It is portable: it keeps `AutoRunManager.state.json` (service start types it turned off, window position) and `Backups` next to itself, so put it in a folder you can write to (not `Program Files`).
 
 ```powershell
 .\tools\publish.ps1                                          # builds publish\AutoRunManager.exe

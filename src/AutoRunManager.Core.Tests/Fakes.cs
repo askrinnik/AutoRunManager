@@ -105,8 +105,15 @@ internal sealed class FakeFileSystem : IFileSystem
 
     public Dictionary<string, System.Text.Encoding?> Encodings { get; } = new(StringComparer.OrdinalIgnoreCase);
 
+    public bool ReadOnly { get; set; }
+
     public void WriteAllText(string path, string text, System.Text.Encoding? encoding = null)
     {
+        if (ReadOnly)
+        {
+            throw new UnauthorizedAccessException(path);
+        }
+
         Files[path] = text;
         Encodings[path] = encoding;
     }

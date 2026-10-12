@@ -24,7 +24,8 @@ public sealed record WindowBounds(double Left, double Top, double Width, double 
 
 /// <summary>
 /// What the app remembers between runs: the start mode a service had before the user turned it
-/// off, and the main window bounds. Stored as JSON in <c>%LOCALAPPDATA%\AutoRunManager\state.json</c>.
+/// off, and the main window bounds. Stored as JSON in <see cref="FileName"/> next to the executable,
+/// so the app stays portable.
 /// </summary>
 public sealed class AppState
 {
@@ -45,11 +46,13 @@ public sealed class AppState
         ServiceStartModes = serviceStartModes;
     }
 
-    public static string DefaultFolder =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AutoRunManager");
+    public const string FileName = "AutoRunManager.state.json";
 
-    /// <summary>Loads <c>state.json</c> from <see cref="DefaultFolder"/>.</summary>
-    public static AppState LoadDefault() => Load(new LocalFileSystem(), Path.Combine(DefaultFolder, "state.json"));
+    /// <summary>The folder of the executable; state and backups live there (portable app).</summary>
+    public static string DefaultFolder => AppContext.BaseDirectory;
+
+    /// <summary>Loads <see cref="FileName"/> from <see cref="DefaultFolder"/>.</summary>
+    public static AppState LoadDefault() => Load(new LocalFileSystem(), Path.Combine(DefaultFolder, FileName));
 
     /// <summary>Saved start modes by service name (case-insensitive).</summary>
     public Dictionary<string, ServiceStartMode> ServiceStartModes { get; }
