@@ -77,49 +77,49 @@ public sealed class EntryActions(
         switch (entry.Locator)
         {
             case RegistryValueLocator value:
-            {
-                List<RegistryValueLocator> values = [value];
-                if (entry.Kind == EntryKind.RunKey)
                 {
-                    values.Add(new RegistryValueLocator(value.Hive, RunKeySource.ApprovedKeyFor(value), value.ValueName));
-                }
+                    List<RegistryValueLocator> values = [value];
+                    if (entry.Kind == EntryKind.RunKey)
+                    {
+                        values.Add(new RegistryValueLocator(value.Hive, RunKeySource.ApprovedKeyFor(value), value.ValueName));
+                    }
 
-                string backup = backups.SaveRegistry(entry, ReadExisting(values));
-                foreach (RegistryValueLocator locator in values)
-                {
-                    registry.DeleteValue(locator.Hive, locator.KeyPath, locator.ValueName);
-                }
+                    string backup = backups.SaveRegistry(entry, ReadExisting(values));
+                    foreach (RegistryValueLocator locator in values)
+                    {
+                        registry.DeleteValue(locator.Hive, locator.KeyPath, locator.ValueName);
+                    }
 
-                return backup;
-            }
+                    return backup;
+                }
 
             case FileLocator file:
-            {
-                RegistryValueLocator approved = new(StartupFolderSource.ApprovedHiveFor(context, file), StartupFolderSource.ApprovedKey, Path.GetFileName(file.Path));
-                string backup = backups.SaveFile(entry, file.Path);
-                if (ReadExisting([approved]).ToList() is [_, ..] approvedValue)
                 {
-                    backups.SaveRegistry(entry, approvedValue);
+                    RegistryValueLocator approved = new(StartupFolderSource.ApprovedHiveFor(context, file), StartupFolderSource.ApprovedKey, Path.GetFileName(file.Path));
+                    string backup = backups.SaveFile(entry, file.Path);
+                    if (ReadExisting([approved]).ToList() is [_, ..] approvedValue)
+                    {
+                        backups.SaveRegistry(entry, approvedValue);
+                    }
+
+                    fileSystem.Delete(file.Path);
+                    registry.DeleteValue(approved.Hive, approved.KeyPath, approved.ValueName);
+                    return backup;
                 }
 
-                fileSystem.Delete(file.Path);
-                registry.DeleteValue(approved.Hive, approved.KeyPath, approved.ValueName);
-                return backup;
-            }
-
             case ScheduledTaskLocator task:
-            {
-                string backup = backups.SaveText(entry, ".xml", scheduler.GetXml(task.TaskPath));
-                scheduler.Delete(task.TaskPath);
-                return backup;
-            }
+                {
+                    string backup = backups.SaveText(entry, ".xml", scheduler.GetXml(task.TaskPath));
+                    scheduler.Delete(task.TaskPath);
+                    return backup;
+                }
 
             case WmiSubscriptionLocator subscription:
-            {
-                string backup = backups.SaveText(entry, ".txt", Describe(entry, subscription));
-                wmi.Delete(subscription.BindingPath, subscription.ConsumerPath, subscription.FilterPath);
-                return backup;
-            }
+                {
+                    string backup = backups.SaveText(entry, ".txt", Describe(entry, subscription));
+                    wmi.Delete(subscription.BindingPath, subscription.ConsumerPath, subscription.FilterPath);
+                    return backup;
+                }
 
             default:
                 throw new InvalidOperationException($"{entry.Kind} entries cannot be deleted.");
