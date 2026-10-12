@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AutoRunManager.Core/AutoRunManager.Core.csproj" />
+  <Project Path="AutoRunManager/AutoRunManager.csproj" />
+  <Project Path="AutoRunManager.Core.Tests/AutoRunManager.Core.Tests.csproj" />
+</Solution>
