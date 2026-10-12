@@ -10,25 +10,18 @@ using AutoRunManager.Services;
 
 namespace AutoRunManager.ViewModels;
 
-public sealed class TabViewModel(TabDefinition definition) : ObservableObject
+/// <summary>A group or section in the side navigation.</summary>
+public sealed class NavigationItemViewModel(NavigationItem item)
 {
-    private int _count;
+    public NavigationItem Item => item;
 
-    public TabDefinition Definition => definition;
+    public string Title => item.IsGroup ? item.Title.ToUpperInvariant() : item.Title;
 
-    public string Label => _count > 0 ? $"{definition.Title}  {_count}" : definition.Title;
+    public string Count => item.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
-    public int Count
-    {
-        get => _count;
-        set
-        {
-            if (Set(ref _count, value))
-            {
-                OnPropertyChanged(nameof(Label));
-            }
-        }
-    }
+    public bool IsGroup => item.IsGroup;
+
+    public bool Matches(NavigationItem other) => other.Group.Title == item.Group.Title && other.Kind == item.Kind;
 }
 
 public sealed record FilterOption(EntryFilter Filter, string Label);
@@ -39,7 +32,8 @@ public sealed class MainViewModel : ObservableObject
     private readonly Func<EntryCollector> _createCollector;
     private readonly EntryActions _actions;
     private List<EntryViewModel> _entries = [];
-    private TabViewModel _selectedTab;
+    private IReadOnlyList<NavigationItemViewModel> _navigation = [];
+    private NavigationItemViewModel? _selectedNavigation;
     private FilterOption _selectedFilter;
     private string _searchText = "";
     private IReadOnlyList<SectionViewModel> _sections = [];
@@ -52,8 +46,6 @@ public sealed class MainViewModel : ObservableObject
         _createCollector = createCollector;
         _actions = actions;
         IsElevated = isElevated;
-        Tabs = EntryTabs.All.Select(t => new TabViewModel(t)).ToList();
-        _selectedTab = Tabs[0];
         Filters =
         [
             new(EntryFilter.All, "All"),
@@ -64,27 +56,40 @@ public sealed class MainViewModel : ObservableObject
         _selectedFilter = Filters[0];
         RefreshCommand = new AsyncCommand(LoadAsync);
         RestartAsAdminCommand = new RelayCommand(RestartAsAdmin);
+        UpdateNavigation();
     }
 
     public bool IsElevated { get; }
 
     public bool ShowRestartAsAdmin => !IsElevated;
 
-    public IReadOnlyList<TabViewModel> Tabs { get; }
-
-    public IReadOnlyList<FilterOption> Filters { get; }
-
-    public TabViewModel SelectedTab
+    public IReadOnlyList<NavigationItemViewModel> Navigation
     {
-        get => _selectedTab;
+        get => _navigation;
+        private set => Set(ref _navigation, value);
+    }
+
+    public NavigationItemViewModel? SelectedNavigation
+    {
+        get => _selectedNavigation;
         set
         {
-            if (value is not null && Set(ref _selectedTab, value))
+            if (value is not null && Set(ref _selectedNavigation, value))
             {
+                // Picking a group or section ends a search, so the choice is visible at once.
+                if (IsSearching)
+                {
+                    _searchText = "";
+                    OnPropertyChanged(nameof(SearchText));
+                    OnPropertyChanged(nameof(IsSearching));
+                }
+
                 Rebuild();
             }
         }
     }
+
+    public IReadOnlyList<FilterOption> Filters { get; }
 
     public FilterOption SelectedFilter
     {
@@ -98,6 +103,7 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>Non-empty text searches every group, not only the selected one.</summary>
     public string SearchText
     {
         get => _searchText;
@@ -105,10 +111,13 @@ public sealed class MainViewModel : ObservableObject
         {
             if (Set(ref _searchText, value ?? ""))
             {
+                OnPropertyChanged(nameof(IsSearching));
                 Rebuild();
             }
         }
     }
+
+    public bool IsSearching => !string.IsNullOrWhiteSpace(_searchText);
 
     public IReadOnlyList<SectionViewModel> Sections
     {
@@ -134,7 +143,9 @@ public sealed class MainViewModel : ObservableObject
     public bool IsEmpty => !IsLoading && Sections.Count == 0;
 
     public string EmptyText =>
-        _entries.Any(e => SelectedTab.Definition.Kinds.Contains(e.Entry.Kind)) ? "No entries match" : "Nothing starts from here";
+        IsSearching ? "Nothing matches the search"
+        : _entries.Any(e => CurrentKinds.Contains(e.Entry.Kind)) ? "No entries match the filter"
+        : "Nothing starts from here";
 
     public string Status
     {
@@ -145,6 +156,9 @@ public sealed class MainViewModel : ObservableObject
     public ICommand RefreshCommand { get; }
 
     public ICommand RestartAsAdminCommand { get; }
+
+    private IReadOnlyList<EntryKind> CurrentKinds =>
+        IsSearching ? EntryTabs.AllKinds : _selectedNavigation?.Item.Kinds ?? EntryTabs.All[0].Kinds;
 
     public async Task LoadAsync()
     {
@@ -166,7 +180,7 @@ public sealed class MainViewModel : ObservableObject
             IsLoading = false;
         }
 
-        UpdateCounts();
+        UpdateNavigation();
         Rebuild();
     }
 
@@ -209,7 +223,7 @@ public sealed class MainViewModel : ObservableObject
         {
             string backup = await Task.Run(() => _actions.Delete(entry.Entry));
             _entries.Remove(entry);
-            UpdateCounts();
+            UpdateNavigation();
             Rebuild();
             Status = $"{entry.Name} deleted. Backup: {backup}";
         }
@@ -295,18 +309,23 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    private void UpdateCounts()
+    /// <summary>Rebuilds the navigation with current counts, keeping the selected item if it still exists.</summary>
+    private void UpdateNavigation()
     {
-        foreach (TabViewModel tab in Tabs)
-        {
-            tab.Count = EntryTabs.Count(tab.Definition, _entries.Select(e => e.Entry));
-        }
+        NavigationItem? selected = _selectedNavigation?.Item;
+        Navigation = EntryTabs.Navigation(_entries.Select(e => e.Entry).ToList())
+            .Select(i => new NavigationItemViewModel(i))
+            .ToList();
+        _selectedNavigation = (selected is null ? null : Navigation.FirstOrDefault(n => n.Matches(selected)))
+            ?? Navigation.FirstOrDefault(n => n.IsGroup && n.Item.Group.Title == selected?.Group.Title)
+            ?? Navigation[0];
+        OnPropertyChanged(nameof(SelectedNavigation));
     }
 
     private void Rebuild()
     {
         Dictionary<StartupEntry, EntryViewModel> byEntry = _entries.ToDictionary<EntryViewModel, StartupEntry>(e => e.Entry, ReferenceEqualityComparer.Instance);
-        Sections = EntryTabs.Sections(SelectedTab.Definition, byEntry.Keys, SelectedFilter.Filter, SearchText)
+        Sections = EntryTabs.Sections(CurrentKinds, byEntry.Keys, SelectedFilter.Filter, SearchText)
             .Select(s => new SectionViewModel(this, s.Kind, s.Entries.Select(e => byEntry[e]).ToList()))
             .ToList();
     }

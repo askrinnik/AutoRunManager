@@ -6,7 +6,7 @@ It is a C# port of a PowerShell/WPF script (`prototype/`), keeping its look and 
 
 ## Using it
 
-- Tabs: **Apps** (what Task Manager shows), **Tasks**, **Services**, **Advanced** (other launch points). Search with Ctrl+F, filter by On / Off / Needs admin, reload with F5.
+- Side navigation: **Apps** (what Task Manager shows) with Registry, Startup folder and Store apps; **Tasks**; **Services**; **Advanced** (other launch points). Search (Ctrl+F) looks through all groups; filter by On / Off / Needs admin, reload with F5.
 - Click a name to open where the entry is defined (regedit at the key, Explorer, Task Scheduler, Services, Settings → Startup apps). Click the path to show the program in Explorer.
 - The switch turns an entry off and on the way Windows does (`StartupApproved`, Store app state, task enabled flag). Services are set to Manual when off and get their previous start type back when on.
 - Entries marked "read-only" have no switch in Windows; they can only be deleted.

@@ -6,9 +6,25 @@ using AutoRunManager.Core.Platform;
 
 namespace AutoRunManager.Core.Actions;
 
+/// <summary>Position and size of the main window in device-independent pixels.</summary>
+public sealed record WindowBounds(double Left, double Top, double Width, double Height)
+{
+    /// <summary>
+    /// Whether the top of the window (where it can be dragged) lies at least partly on the given
+    /// screen area, so a window saved on a monitor that is gone is not restored off-screen.
+    /// </summary>
+    public bool IsReachableOn(double screenLeft, double screenTop, double screenWidth, double screenHeight)
+    {
+        const double grip = 40;
+        return Width > 0 && Height > 0
+            && Left + Width - grip >= screenLeft && Left + grip <= screenLeft + screenWidth
+            && Top >= screenTop && Top + grip <= screenTop + screenHeight;
+    }
+}
+
 /// <summary>
 /// What the app remembers between runs: the start mode a service had before the user turned it
-/// off. Stored as JSON in <c>%LOCALAPPDATA%\AutoRunManager\state.json</c>.
+/// off, and the main window bounds. Stored as JSON in <c>%LOCALAPPDATA%\AutoRunManager\state.json</c>.
 /// </summary>
 public sealed class AppState
 {
@@ -32,18 +48,26 @@ public sealed class AppState
     public static string DefaultFolder =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AutoRunManager");
 
+    /// <summary>Loads <c>state.json</c> from <see cref="DefaultFolder"/>.</summary>
+    public static AppState LoadDefault() => Load(new LocalFileSystem(), Path.Combine(DefaultFolder, "state.json"));
+
     /// <summary>Saved start modes by service name (case-insensitive).</summary>
     public Dictionary<string, ServiceStartMode> ServiceStartModes { get; }
+
+    public WindowBounds? Window { get; set; }
 
     /// <summary>Loads the state; a missing or unreadable file gives an empty state.</summary>
     public static AppState Load(IFileSystem fileSystem, string path)
     {
         Dictionary<string, ServiceStartMode> modes = new(StringComparer.OrdinalIgnoreCase);
+        WindowBounds? window = null;
         if (fileSystem.ReadAllText(path) is { } json)
         {
             try
             {
-                if (JsonSerializer.Deserialize<StateFile>(json, s_json)?.ServiceStartModes is { } stored)
+                StateFile? file = JsonSerializer.Deserialize<StateFile>(json, s_json);
+                window = file?.Window;
+                if (file?.ServiceStartModes is { } stored)
                 {
                     foreach ((string name, ServiceStartMode mode) in stored)
                     {
@@ -56,11 +80,11 @@ public sealed class AppState
             }
         }
 
-        return new AppState(fileSystem, path, modes);
+        return new AppState(fileSystem, path, modes) { Window = window };
     }
 
     public void Save() =>
-        _fileSystem.WriteAllText(_path, JsonSerializer.Serialize(new StateFile(ServiceStartModes), s_json));
+        _fileSystem.WriteAllText(_path, JsonSerializer.Serialize(new StateFile(ServiceStartModes, Window), s_json));
 
-    private sealed record StateFile(Dictionary<string, ServiceStartMode>? ServiceStartModes);
+    private sealed record StateFile(Dictionary<string, ServiceStartMode>? ServiceStartModes, WindowBounds? Window);
 }

@@ -21,7 +21,7 @@ public sealed class EntryActions(
     BackupStore backups,
     TimeProvider time)
 {
-    public static EntryActions CreateDefault()
+    public static EntryActions CreateDefault(AppState state)
     {
         LocalFileSystem fileSystem = new();
         return new EntryActions(
@@ -31,7 +31,7 @@ public sealed class EntryActions(
             new ServiceControl(),
             new WmiSubscriptions(),
             SystemContext.Current(),
-            AppState.Load(fileSystem, Path.Combine(AppState.DefaultFolder, "state.json")),
+            state,
             new BackupStore(fileSystem, BackupStore.DefaultFolder, TimeProvider.System),
             TimeProvider.System);
     }

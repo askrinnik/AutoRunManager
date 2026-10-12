@@ -281,3 +281,30 @@ public class ElevationTests
         Assert.False(Elevation.IsAccessDenied(new Win32Exception(2)));
     }
 }
+
+public class WindowBoundsTests
+{
+    [Theory]
+    [InlineData(100, 100, 800, 600, true)]
+    [InlineData(-760, 100, 800, 600, true)]
+    [InlineData(-790, 100, 800, 600, false)]
+    [InlineData(1900, 100, 800, 600, false)]
+    [InlineData(100, -5, 800, 600, false)]
+    [InlineData(100, 1050, 800, 600, false)]
+    [InlineData(100, 100, 0, 600, false)]
+    public void IsReachableOn_RequiresTheTopEdgeOnScreen(double left, double top, double width, double height, bool expected)
+    {
+        Assert.Equal(expected, new WindowBounds(left, top, width, height).IsReachableOn(0, 0, 1920, 1080));
+    }
+
+    [Fact]
+    public void AppState_RoundTripsWindowBounds()
+    {
+        FakeFileSystem files = new();
+        AppState state = AppState.Load(files, @"C:\s.json");
+        state.Window = new WindowBounds(10, 20, 820, 650);
+        state.Save();
+
+        Assert.Equal(new WindowBounds(10, 20, 820, 650), AppState.Load(files, @"C:\s.json").Window);
+    }
+}

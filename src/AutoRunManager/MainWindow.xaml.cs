@@ -16,12 +16,15 @@ public partial class MainWindow : Window
     private readonly GradientStop _topStop = new(Colors.Black, 0.0);
     private readonly GradientStop _bottomStop = new(Colors.Black, 1.0);
     private readonly MainViewModel _model;
+    private readonly AppState _state;
     private bool _closing;
 
-    public MainWindow(bool elevated)
+    public MainWindow(bool elevated, AppState state)
     {
         InitializeComponent();
-        _model = new MainViewModel(new WindowDialogs(this), EntryCollector.CreateDefault, EntryActions.CreateDefault(), elevated);
+        _state = state;
+        ApplySavedBounds(state.Window);
+        _model = new MainViewModel(new WindowDialogs(this), EntryCollector.CreateDefault, EntryActions.CreateDefault(state), elevated);
         DataContext = _model;
 
         EntriesScroll.OpacityMask = new LinearGradientBrush(
@@ -35,11 +38,40 @@ public partial class MainWindow : Window
         Loaded += async (_, _) => await _model.LoadAsync();
         _model.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(MainViewModel.SelectedTab) or nameof(MainViewModel.SelectedFilter) or nameof(MainViewModel.SearchText))
+            if (e.PropertyName is nameof(MainViewModel.SelectedNavigation) or nameof(MainViewModel.SelectedFilter) or nameof(MainViewModel.SearchText))
             {
                 EntriesScroll.ScrollToTop();
             }
         };
+    }
+
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        base.OnClosing(e);
+        Rect bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
+        _state.Window = new WindowBounds(bounds.Left, bounds.Top, bounds.Width, bounds.Height);
+        try
+        {
+            _state.Save();
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            // Losing the window position is not worth an error on exit.
+        }
+    }
+
+    /// <summary>Uses the saved bounds if the window would still be reachable; otherwise keeps the centered default.</summary>
+    private void ApplySavedBounds(WindowBounds? saved)
+    {
+        if (saved is not null
+            && saved.IsReachableOn(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight))
+        {
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = saved.Left;
+            Top = saved.Top;
+            Width = Math.Max(saved.Width, MinWidth);
+            Height = Math.Max(saved.Height, MinHeight);
+        }
     }
 
     private void OnHeaderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Windows;
 
+using AutoRunManager.Core.Actions;
 using AutoRunManager.Core.Model;
 using AutoRunManager.Core.Platform;
 using AutoRunManager.Core.Sources;
@@ -24,7 +25,7 @@ public partial class App : Application
 
         // --preview-unelevated: show the UI as a non-elevated process would (for machines with UAC off).
         bool elevated = Elevation.IsElevated() && !e.Args.Contains("--preview-unelevated");
-        new MainWindow(elevated).Show();
+        new MainWindow(elevated, AppState.LoadDefault()).Show();
     }
 
     private static void WriteList(string file)

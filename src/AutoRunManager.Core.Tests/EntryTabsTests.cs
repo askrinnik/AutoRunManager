@@ -29,7 +29,7 @@ public class EntryTabsTests
     [Fact]
     public void Sections_FollowTabOrderAndKeepEntryOrder()
     {
-        var sections = EntryTabs.Sections(EntryTabs.All[0], Entries, EntryFilter.All, null);
+        var sections = EntryTabs.Sections(EntryTabs.All[0].Kinds, Entries, EntryFilter.All, null);
 
         Assert.Equal([EntryKind.RunKey, EntryKind.PackagedApp], sections.Select(s => s.Kind));
         Assert.Equal(["Viber", "Docker"], sections[0].Entries.Select(e => e.Name));
@@ -40,6 +40,26 @@ public class EntryTabsTests
     {
         Assert.Equal(3, EntryTabs.Count(EntryTabs.All[0], Entries));
         Assert.Equal(1, EntryTabs.Count(EntryTabs.All[3], Entries));
+    }
+
+    [Fact]
+    public void Navigation_ListsGroupsAndNonEmptySectionsOfMultiKindGroups()
+    {
+        var items = EntryTabs.Navigation(Entries);
+
+        Assert.Equal(
+            ["Apps 3", "Registry 2", "Store apps 1", "Tasks 0", "Services 1", "Advanced 1", "RunOnce 1"],
+            items.Select(i => $"{i.Title} {i.Count}"));
+        Assert.True(items[0].IsGroup);
+        Assert.Equal([EntryKind.RunKey], items[1].Kinds);
+        Assert.Equal(EntryTabs.All[0].Kinds, items[0].Kinds);
+    }
+
+    [Fact]
+    public void AllKinds_FollowsNavigationOrder()
+    {
+        Assert.Equal(EntryKind.RunKey, EntryTabs.AllKinds[0]);
+        Assert.Equal(EntryKind.WmiSubscription, EntryTabs.AllKinds[^1]);
     }
 
     [Theory]

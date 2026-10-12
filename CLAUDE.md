@@ -27,15 +27,15 @@ UAC is off on this machine (`EnableLUA = 0`): every process of the user is eleva
   - `Model/`: `StartupEntry`, `EntryKind` (+ group and display name), `EntryLocator` subtypes that identify where an entry is defined.
   - `Parsing/`: pure helpers: `CommandLine` (command → program path), `StartupApprovedValue`, `TaskNames`, `ServiceRules` (listing filter, start modes, off/on policy), `PackagedStartupTasks` (manifest parsing, `State` values), `LaunchPointRules` (defaults of Winlogon and BootExecute).
   - `Platform/`: thin wrappers: `IRegistry` (64-bit view, raw values), `IFileSystem`, `ITaskScheduler` (COM `Schedule.Service`), `IIndirectStrings` (`SHLoadIndirectString`), `IWmiSubscriptions` (System.Management), `IServiceControl` (`ChangeServiceConfig`), `Elevation`, `SystemContext` (folders, current user).
-  - `Actions/`: `EntryActions` (toggle per location; delete after a backup), `BackupStore` (`%LOCALAPPDATA%\AutoRunManager\backups`: `.reg`, file copy, task XML, text), `RegFile` (regedit export format, UTF-16), `AppState` (`state.json`: saved service start modes).
-  - `Presentation/`: `EntryTabs` (tabs and their sections), `EntryQuery` (filter and search).
+  - `Actions/`: `EntryActions` (toggle per location; delete after a backup), `BackupStore` (`%LOCALAPPDATA%\AutoRunManager\backups`: `.reg`, file copy, task XML, text), `RegFile` (regedit export format, UTF-16), `AppState` (`state.json`: saved service start modes, window bounds).
+  - `Presentation/`: `EntryTabs` (groups, side navigation items, sections), `EntryQuery` (filter and search).
   - `Sources/`: one `IEntrySource` per location (`RunKeySource`, `StartupFolderSource`, `PackagedAppSource`, `ScheduledTaskSource`, `ServiceSource`, `RegistryLaunchPointSource` for all group B registry locations, `WmiSubscriptionSource`); `EntryCollector` runs them and reports failing sources.
 - `src/AutoRunManager`: WinExe, WPF, manifest `asInvoker`.
-  - `Themes/`: `Colors.xaml` (prototype palette), `Controls.xaml` (accent button, toggle switch, tabs, filter chips, search box).
-  - `ViewModels/`: `MainViewModel` (load off the UI thread, tabs, search, filter, toggle, delete, toggle a whole section), `EntryViewModel`, `SectionViewModel`, `AsyncCommand`.
+  - `Themes/`: `Colors.xaml` (prototype palette), `Controls.xaml` (accent button, toggle switch, navigation items, filter chips, search box).
+  - `ViewModels/`: `MainViewModel` (load off the UI thread, navigation, search across all groups, filter, toggle, delete, toggle a whole section), `EntryViewModel`, `SectionViewModel`, `AsyncCommand`.
   - `Dialogs/`: `DialogWindow` (confirm/message in the prototype style), `WindowEffects` (fades).
   - `Services/`: `IconLoader` (`SHGetFileInfo`, cached), `ShellLauncher` (regedit at the key, Explorer select, taskschd.msc, services.msc, Settings startup page, restart elevated).
-  - `MainWindow`: tabs from `Core/Presentation/EntryTabs`, search (Ctrl+F), F5 reloads.
+  - `MainWindow`: side navigation from `Core/Presentation/EntryTabs`, search (Ctrl+F), F5 reloads; resizable (WindowChrome); bounds saved in `state.json` on close.
 - `src/AutoRunManager.Core.Tests`: xUnit tests with fake platform interfaces.
 - `tools/`: `publish.ps1` (framework-dependent single-file win-x64; `-InstallDir` copies the exe, stopping a running copy), `make-icon.ps1` (power symbol in the accent color).
 - `prototype/AutoRun.Resources.AutoRun.ps1`: working PowerShell/WPF prototype. Reference for look and behavior; not built or shipped.

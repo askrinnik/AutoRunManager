@@ -98,25 +98,39 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <!-- Tabs: plain text, the selected one in accent color with an underline. -->
-    <Style x:Key="TabItemStyle" TargetType="ListBoxItem">
+    <!-- Side navigation: bold group rows, indented section rows, counts on the right. -->
+    <Style x:Key="NavigationItemStyle" TargetType="ListBoxItem">
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Margin" Value="0,0,18,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <StackPanel Background="Transparent">
-                        <TextBlock x:Name="Label" Text="{Binding Label}" FontFamily="{StaticResource UiFont}" FontSize="13"
-                                   FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,5" />
-                        <Border x:Name="Underline" Height="2" CornerRadius="1" Background="{StaticResource AccentBrush}" Visibility="Hidden" />
-                    </StackPanel>
+                    <Border x:Name="Bg" CornerRadius="6" Padding="10,6" Margin="0,1" Background="Transparent">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="Title" Text="{Binding Title}" FontFamily="{StaticResource UiFont}" FontSize="12"
+                                       Foreground="{StaticResource SecondaryTextBrush}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Text="{Binding Count}" FontFamily="{StaticResource UiFont}" FontSize="11"
+                                       Foreground="{StaticResource SecondaryTextBrush}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
                     <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                            <Setter TargetName="Bg" Property="Margin" Value="0,8,0,1" />
+                            <Setter TargetName="Title" Property="FontWeight" Value="Bold" />
+                            <Setter TargetName="Title" Property="Foreground" Value="{StaticResource HeaderTextBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsGroup}" Value="False">
+                            <Setter TargetName="Title" Property="Margin" Value="12,0,0,0" />
+                        </DataTrigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Label" Property="Foreground" Value="{StaticResource HeaderTextBrush}" />
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource CardBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Label" Property="Foreground" Value="{StaticResource AccentBrush}" />
-                            <Setter TargetName="Underline" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource IconBackgroundBrush}" />
+                            <Setter TargetName="Title" Property="Foreground" Value="{StaticResource TextBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

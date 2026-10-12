@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:AutoRunManager.ViewModels"
         Title="Startup Manager"
-        Width="600"
+        Width="820"
         Height="650"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="CanResize"
-        MinWidth="480"
+        MinWidth="600"
         MinHeight="360"
         WindowStartupLocation="CenterScreen">
     <!-- Borderless but resizable from every edge; the header is the drag handle. -->
@@ -144,8 +144,6 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -210,37 +208,70 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Tabs -->
-            <ListBox Grid.Row="1" Style="{StaticResource BareListBox}" ItemContainerStyle="{StaticResource TabItemStyle}"
-                     ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" Margin="5,0,0,10" />
-
-            <!-- Search and filter -->
-            <Grid Grid.Row="2" Margin="5,0,5,6">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="190" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="SearchBox" Style="{StaticResource SearchBox}" Tag="Search name, path or location  (Ctrl+F)"
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" />
-                <ListBox Grid.Column="1" Style="{StaticResource BareListBox}" ItemContainerStyle="{StaticResource ChipItemStyle}"
-                         ItemsSource="{Binding Filters}" SelectedItem="{Binding SelectedFilter}" VerticalAlignment="Center" Margin="8,0,0,0" />
+
+                <!-- Side navigation: groups and their sections; dimmed while a search spans all groups. -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,14,0">
+                    <ListBox ItemsSource="{Binding Navigation}" SelectedItem="{Binding SelectedNavigation}"
+                             ItemContainerStyle="{StaticResource NavigationItemStyle}">
+                        <ListBox.Style>
+                            <Style TargetType="ListBox" BasedOn="{StaticResource BareListBox}">
+                                <Setter Property="ItemsPanel">
+                                    <Setter.Value>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel />
+                                        </ItemsPanelTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSearching}" Value="True">
+                                        <Setter Property="Opacity" Value="0.45" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
+                    </ListBox>
+                </ScrollViewer>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Search (all groups) and filter -->
+                    <Grid Margin="5,0,5,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="SearchBox" Style="{StaticResource SearchBox}" Tag="Search all entries  (Ctrl+F)"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" />
+                        <ListBox Grid.Column="1" Style="{StaticResource BareListBox}" ItemContainerStyle="{StaticResource ChipItemStyle}"
+                                 ItemsSource="{Binding Filters}" SelectedItem="{Binding SelectedFilter}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                    </Grid>
+
+                    <!-- Entries -->
+                    <ScrollViewer x:Name="EntriesScroll" Grid.Row="1" VerticalScrollBarVisibility="Hidden" ScrollChanged="OnEntriesScrollChanged">
+                        <ItemsControl ItemsSource="{Binding Sections}" ItemTemplate="{StaticResource SectionTemplate}" />
+                    </ScrollViewer>
+                    <TextBlock Grid.Row="1" Text="Loading..." Foreground="{StaticResource SecondaryTextBrush}" FontFamily="{StaticResource UiFont}"
+                               FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+                    <Border Grid.Row="1" Background="{StaticResource CardBrush}" CornerRadius="10" Margin="5,15,5,5" Padding="20" VerticalAlignment="Top"
+                            Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="{Binding EmptyText}" Foreground="{StaticResource SecondaryTextBrush}" FontFamily="{StaticResource UiFont}"
+                                   FontSize="13" HorizontalAlignment="Center" Opacity="0.6" />
+                    </Border>
+                </Grid>
             </Grid>
 
-            <!-- Entries -->
-            <ScrollViewer x:Name="EntriesScroll" Grid.Row="3" VerticalScrollBarVisibility="Hidden" ScrollChanged="OnEntriesScrollChanged">
-                <ItemsControl ItemsSource="{Binding Sections}" ItemTemplate="{StaticResource SectionTemplate}" />
-            </ScrollViewer>
-            <TextBlock Grid.Row="3" Text="Loading..." Foreground="{StaticResource SecondaryTextBrush}" FontFamily="{StaticResource UiFont}"
-                       FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
-            <Border Grid.Row="3" Background="{StaticResource CardBrush}" CornerRadius="10" Margin="5,15,5,5" Padding="20" VerticalAlignment="Top"
-                    Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}">
-                <TextBlock Text="{Binding EmptyText}" Foreground="{StaticResource SecondaryTextBrush}" FontFamily="{StaticResource UiFont}"
-                           FontSize="13" HorizontalAlignment="Center" Opacity="0.6" />
-            </Border>
-
             <!-- Status -->
-            <TextBlock Grid.Row="4" Text="{Binding Status}" Foreground="{StaticResource SecondaryTextBrush}" FontFamily="{StaticResource UiFont}"
+            <TextBlock Grid.Row="2" Text="{Binding Status}" Foreground="{StaticResource SecondaryTextBrush}" FontFamily="{StaticResource UiFont}"
                        FontSize="10" Margin="5,8,5,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" />
         </Grid>
     </Border>
