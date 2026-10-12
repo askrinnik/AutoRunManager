@@ -41,9 +41,10 @@ public static partial class CommandLine
 
         if (text.StartsWith('"'))
         {
-            int end = text.IndexOf('"', 1);
-            string quoted = end > 0 ? text[1..end] : text[1..];
-            return quoted.Trim();
+            // Some installers double the quotes: ""C:\...\app.exe"".
+            string inner = text.TrimStart('"');
+            int end = inner.IndexOf('"');
+            return (end >= 0 ? inner[..end] : inner).Trim();
         }
 
         Match match = ExecutablePattern().Match(text);

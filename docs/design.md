@@ -83,8 +83,8 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 
 0. Harness: repository, docs, settings. **Done.**
 1. Solution skeleton: `.slnx`, shared props, WPF window, empty Core and tests. **Done.**
-2. Core model and pure helpers with tests: command-line → executable path, `StartupApproved` encode/decode, task name cleanup, service filter.
-3. Read-only sources for group A and the prototype's tasks and services; compare the list with the prototype and Task Manager on the real machine.
+2. Core model and pure helpers with tests: command-line → executable path, `StartupApproved` encode/decode, task name cleanup, service filter. **Done.**
+3. Read-only sources for group A and the prototype's tasks and services; compare the list with the prototype and Task Manager on the real machine. **Done** (checked with `--list`: Run32 and Store app entries appear; a task with doubled quotes around its program path is parsed).
 4. Read-only sources for group B.
 5. Actions: toggle, delete with backup; admin-rights detection per entry.
 6. WPF UI port of the prototype design; async loading.

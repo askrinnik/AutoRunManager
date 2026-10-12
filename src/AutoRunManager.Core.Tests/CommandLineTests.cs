@@ -20,6 +20,7 @@ public class CommandLineTests
     [InlineData(@"\SystemRoot\System32\drivers\nxusbf.sys", @"C:\Windows\System32\drivers\nxusbf.sys")]
     [InlineData(@"System32\drivers\veracrypt.sys", @"C:\Windows\System32\drivers\veracrypt.sys")]
     [InlineData(@"""C:\Unclosed\app.exe", @"C:\Unclosed\app.exe")]
+    [InlineData(@"""""C:\Doubled\app.exe"""" -background", @"C:\Doubled\app.exe")]
     [InlineData(@"C:\NoExtension\tool", @"C:\NoExtension\tool")]
     [InlineData(@"C:\Startup\Script.lnk", @"C:\Startup\Script.lnk")]
     public void GetExecutablePath_ExtractsProgram(string? command, string? expected)

@@ -9,13 +9,20 @@ dotnet build src                              # whole solution (src/AutoRunManag
 dotnet test src                               # xUnit tests for Core
 dotnet run --project src/AutoRunManager       # run the app
 dotnet format src --verify-no-changes         # check formatting against src/.editorconfig
+src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --list <file.tsv>   # dump all entries as TSV, no window
 ```
+
+`--list` runs the same collector as the window and is the quickest way to check sources against the real machine (start it with `Start-Process -Wait`; it is a WinExe and prints nothing to the console).
 
 ## Layout
 
 `src/` is a self-contained C# solution: `AutoRunManager.slnx` (flat, no solution folders), `Directory.Build.props`, `.editorconfig` and all projects, including tests.
 
-- `src/AutoRunManager.Core`: model, pure helpers, one source class per autostart location behind thin platform interfaces (registry, file system, Task Scheduler, services). No UI.
+- `src/AutoRunManager.Core`: no UI.
+  - `Model/`: `StartupEntry`, `EntryKind` (+ group and display name), `EntryLocator` subtypes that identify where an entry is defined.
+  - `Parsing/`: pure helpers: `CommandLine` (command → program path), `StartupApprovedValue`, `TaskNames`, `ServiceRules` (listing filter, start modes, off/on policy), `PackagedStartupTasks` (manifest parsing, `State` values).
+  - `Platform/`: thin wrappers: `IRegistry` (64-bit view, raw values), `IFileSystem`, `ITaskScheduler` (COM `Schedule.Service`), `IIndirectStrings` (`SHLoadIndirectString`), `SystemContext` (folders, current user).
+  - `Sources/`: one `IEntrySource` per location (`RunKeySource`, `StartupFolderSource`, `PackagedAppSource`, `ScheduledTaskSource`, `ServiceSource`); `EntryCollector` runs them and reports failing sources.
 - `src/AutoRunManager`: WinExe, WPF. `Themes/` (colors and control templates in XAML), main window, dialogs. Manifest `asInvoker`.
 - `src/AutoRunManager.Core.Tests`: xUnit tests with fake platform interfaces.
 - `prototype/AutoRun.Resources.AutoRun.ps1`: working PowerShell/WPF prototype. Reference for look and behavior; not built or shipped.
