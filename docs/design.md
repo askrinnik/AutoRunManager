@@ -11,13 +11,13 @@ A WPF app (.NET 10) that shows every place where Windows 11 starts apps and serv
 3. Runs without elevation (`asInvoker`). Entries that need admin rights to change are shown, their controls are disabled with a tooltip, and the window offers "Restart as administrator".
 4. Data is collected off the UI thread; the window never freezes while loading.
 5. Toggle and delete per entry; clicking a category header toggles all its entries after confirmation.
-6. Services can be turned on or off, never deleted.
+6. Services can be turned off (`Manual`) and on (previous start type), never deleted.
 7. Before deleting an entry, its definition is saved to a backup in `%LOCALAPPDATA%\AutoRunManager\backups`.
 8. No links to the prototype author's social accounts.
 
 ## Autostart locations
 
-Grouped by how Windows itself treats them. "Native toggle" means Windows has its own enabled/disabled state for the entry (the one Task Manager and Settings use); for the others, turning an entry off needs a mechanism of our own (open question 1).
+Grouped by how Windows itself treats them. "Native toggle" means Windows has its own enabled/disabled state for the entry (the one Task Manager and Settings use). Entries without a native toggle are read-only: the app shows them, opens their location and deletes them with a backup, but does not turn them off.
 
 ### Group A: what Task Manager and Settings → Apps → Startup show (native toggle)
 
@@ -51,14 +51,14 @@ Grouped by how Windows itself treats them. "Native toggle" means Windows has its
 
 ### Group C: deep system extension points (Sysinternals Autoruns level)
 
-Drivers, Explorer shell extensions, browser helper objects, codecs, Winsock/LSA/network/print providers, KnownDLLs, Office add-ins. Hundreds of entries on a normal machine, mostly Microsoft; not planned (open question 2).
+Drivers, Explorer shell extensions, browser helper objects, codecs, Winsock/LSA/network/print providers, KnownDLLs, Office add-ins. Hundreds of entries on a normal machine, mostly Microsoft; undecided (open question 1).
 
 ## Prototype behavior and fixes
 
 The prototype is plain PowerShell building WPF from code (no embedded C#). Defects fixed in the port:
 
 1. No elevation check: writes to HKLM, services and tasks fail silently.
-2. Services: off sets `Disabled`, on always sets `Automatic`; the original start type is lost (open question 3).
+2. Services: off sets `Disabled`, on always sets `Automatic`; the original start type is lost. Now off sets `Manual` and on restores the start type saved when it was turned off (`Automatic` if none was saved).
 3. Tasks are enabled, disabled and deleted by name only, without the task path; wrong or no task in subfolders.
 4. Startup folders list only `.lnk` files.
 5. Category header click toggles all entries without confirmation.
@@ -70,13 +70,14 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 
 - WPF, not WinForms: the prototype is WPF, and its templates (toggle, button, fades) port directly to XAML.
 - `src/AutoRunManager.Core` holds the model, pure parsing helpers and one source class per location behind thin platform interfaces (registry, file system, Task Scheduler COM, Service Control Manager P/Invoke). Pure parts are unit-tested with fakes.
+- Group B entries without a native toggle are read-only (open location, delete with backup). Turning them off through a store of our own (as Autoruns does with its `AutorunsDisabled` keys) may come later.
+- Services: "off" sets `Manual`, not `Disabled`, so apps that start their service on demand keep working. The previous start type is saved in `%LOCALAPPDATA%\AutoRunManager\state.json` and restored by "on".
 - `src/AutoRunManager` is the WPF shell: XAML themes, view models, dialogs, icon loading, shell launching, elevation.
 
 ## Open questions
 
-1. Group B entries without a native toggle: read-only (open location, delete with backup) or turn off by moving the value to a store of our own (as Autoruns does with its `AutorunsDisabled` keys)?
-2. Is any part of group C wanted?
-3. Services: which start type should "off" set (`Disabled` as in the prototype, or `Manual`), and should "on" restore the start type the service had before?
+1. Is any part of group C wanted?
+2. Arrangement of the groups in the window (tabs or another layout).
 
 ## Roadmap
 
