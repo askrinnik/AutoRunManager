@@ -69,6 +69,7 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 ## Design decisions
 
 - WPF, not WinForms: the prototype is WPF, and its templates (toggle, button, fades) port directly to XAML.
+- Window layout: tabs with entry counts (Apps: Run keys, Startup folders, Store apps; Tasks; Services; Advanced: the rest of group B), a search box and a filter (All, On, Off, Needs admin) under the tabs, entries grouped into sections per location inside a tab. Fixed height (650) so switching tabs does not resize the window.
 - `src/AutoRunManager.Core` holds the model, pure parsing helpers and one source class per location behind thin platform interfaces (registry, file system, Task Scheduler COM, Service Control Manager P/Invoke). Pure parts are unit-tested with fakes.
 - Group B entries without a native toggle are read-only (open location, delete with backup). Turning them off through a store of our own (as Autoruns does with its `AutorunsDisabled` keys) may come later.
 - Services: "off" sets `Manual`, not `Disabled`, so apps that start their service on demand keep working. The previous start type is saved in `%LOCALAPPDATA%\AutoRunManager\state.json` and restored by "on".
@@ -76,8 +77,7 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 
 ## Open questions
 
-1. Is any part of group C wanted?
-2. Arrangement of the groups in the window (tabs or another layout).
+1. Group C: postponed until the app with groups A and B is released (on this machine: third-party drivers such as NoMachine, VeraCrypt, ViGEmBus, FortiFilter; Explorer extensions such as 7-Zip, TortoiseGit, TortoiseSVN, NVIDIA).
 
 ## Roadmap
 
@@ -87,6 +87,6 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 3. Read-only sources for group A and the prototype's tasks and services; compare the list with the prototype and Task Manager on the real machine. **Done** (checked with `--list`: Run32 and Store app entries appear; a task with doubled quotes around its program path is parsed).
 4. Read-only sources for group B. **Done.** Winlogon, BootExecute and AppInit_DLLs entries are listed only when they differ from the default and are never deleted.
 5. Actions: toggle, delete with backup; admin-rights detection per entry. **Done.** Verified on the machine with test entries only (HKCU Run value, user Startup file, user task): toggle, delete, backup, restore of the `.reg` backup. Not verified on the machine: Store app toggle, service start type change, WMI deletion.
-6. WPF UI port of the prototype design; async loading.
-7. Elevation: disabled controls, "Restart as administrator".
+6. WPF UI port of the prototype design; async loading. **Done.** Tabs, search and filter as decided; checked with screenshots.
+7. Elevation: disabled controls, "Restart as administrator". **Done.** Checked only with `--preview-unelevated`: UAC is off on the development machine.
 8. Manual check on the real machine with test entries only; publish script, icon, README.

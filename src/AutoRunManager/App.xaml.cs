@@ -3,6 +3,7 @@ using System.Text;
 using System.Windows;
 
 using AutoRunManager.Core.Model;
+using AutoRunManager.Core.Platform;
 using AutoRunManager.Core.Sources;
 
 namespace AutoRunManager;
@@ -21,7 +22,9 @@ public partial class App : Application
             return;
         }
 
-        new MainWindow().Show();
+        // --preview-unelevated: show the UI as a non-elevated process would (for machines with UAC off).
+        bool elevated = Elevation.IsElevated() && !e.Args.Contains("--preview-unelevated");
+        new MainWindow(elevated).Show();
     }
 
     private static void WriteList(string file)
