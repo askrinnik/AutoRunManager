@@ -82,6 +82,20 @@ public class RegistryLaunchPointSourceTests
     }
 
     [Fact]
+    public void Enumerate_LegacyRunServicesAreReadOnlyWithNote()
+    {
+        FakeRegistry registry = new FakeRegistry()
+            .Set(RegistryHive.CurrentUser, Cv + @"\RunServices", "Old", @"C:\Old\old.exe")
+            .Set(RegistryHive.LocalMachine, @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\RunServicesOnce", "Older", @"C:\Old\older.exe");
+
+        List<StartupEntry> entries = Enumerate(registry);
+
+        Assert.Equal(["Old", "Older"], entries.Select(e => e.Name));
+        Assert.All(entries, e => Assert.True(e.Kind == EntryKind.RunServices && e.State == EntryState.Active && !e.CanToggle));
+        Assert.All(entries, e => Assert.Contains("do not run", e.Details));
+    }
+
+    [Fact]
     public void Enumerate_UserShellAndWindowsLoadAreListed()
     {
         FakeRegistry registry = new FakeRegistry()

@@ -39,6 +39,7 @@ Grouped by how Windows itself treats them. "Native toggle" means Windows has its
 | Task Scheduler, all tasks outside `\Microsoft\` (task path, actions, triggers) | native (task enabled flag) | yes |
 | Services (`HKLM\SYSTEM\CurrentControlSet\Services`, Win32 services outside Windows and Defender) | start type | yes |
 | `RunOnce` / `RunOnceEx` (HKCU, HKLM, WOW6432Node) | none | no |
+| `RunServices` / `RunServicesOnce` (HKCU, HKLM, WOW6432Node): Windows 9x legacy, not run by Windows 10/11; listed for completeness | none | no |
 | `…\Policies\Explorer\Run` (HKCU, HKLM) | none | no |
 | `HKLM\…\Windows NT\CurrentVersion\Winlogon` `Shell`, `Userinit` (only non-default values) | none | no |
 | `HKCU\…\Windows NT\CurrentVersion\Windows` `Load`, `Run` | none | no |

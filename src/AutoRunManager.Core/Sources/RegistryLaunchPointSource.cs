@@ -25,6 +25,12 @@ public sealed class RegistryLaunchPointSource(IRegistry registry, SystemContext 
         (EntryKind.RunOnce, RegistryHive.CurrentUser, CurrentVersion + @"\RunOnce"),
         (EntryKind.RunOnce, RegistryHive.LocalMachine, CurrentVersion + @"\RunOnce"),
         (EntryKind.RunOnce, RegistryHive.LocalMachine, Wow64CurrentVersion + @"\RunOnce"),
+        (EntryKind.RunServices, RegistryHive.CurrentUser, CurrentVersion + @"\RunServices"),
+        (EntryKind.RunServices, RegistryHive.CurrentUser, CurrentVersion + @"\RunServicesOnce"),
+        (EntryKind.RunServices, RegistryHive.LocalMachine, CurrentVersion + @"\RunServices"),
+        (EntryKind.RunServices, RegistryHive.LocalMachine, CurrentVersion + @"\RunServicesOnce"),
+        (EntryKind.RunServices, RegistryHive.LocalMachine, Wow64CurrentVersion + @"\RunServices"),
+        (EntryKind.RunServices, RegistryHive.LocalMachine, Wow64CurrentVersion + @"\RunServicesOnce"),
         (EntryKind.PolicyRun, RegistryHive.CurrentUser, CurrentVersion + @"\Policies\Explorer\Run"),
         (EntryKind.PolicyRun, RegistryHive.LocalMachine, CurrentVersion + @"\Policies\Explorer\Run"),
         (EntryKind.PolicyRun, RegistryHive.LocalMachine, Wow64CurrentVersion + @"\Policies\Explorer\Run"),
@@ -39,6 +45,9 @@ public sealed class RegistryLaunchPointSource(IRegistry registry, SystemContext 
         (RegistryHive.LocalMachine, CurrentVersion + @"\RunOnceEx"),
         (RegistryHive.LocalMachine, Wow64CurrentVersion + @"\RunOnceEx"),
     ];
+
+    /// <summary>RunServices keys come from Windows 9x; listed for completeness only.</summary>
+    internal const string LegacyNote = "Legacy Windows 9x key: Windows 10 and 11 do not run entries from here.";
 
     public string Name => "Registry launch points";
 
@@ -80,7 +89,8 @@ public sealed class RegistryLaunchPointSource(IRegistry registry, SystemContext 
                 continue;
             }
 
-            yield return Entry(kind, valueName.Length > 0 ? valueName : "(Default)", command, hive, keyPath, valueName, canDelete: true);
+            yield return Entry(kind, valueName.Length > 0 ? valueName : "(Default)", command, hive, keyPath, valueName, canDelete: true,
+                details: kind == EntryKind.RunServices ? LegacyNote : null);
         }
     }
 

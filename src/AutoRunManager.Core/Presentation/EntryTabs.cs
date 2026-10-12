@@ -26,7 +26,7 @@ public static class EntryTabs
         new("Services", [EntryKind.Service]),
         new("Advanced",
         [
-            EntryKind.RunOnce, EntryKind.PolicyRun, EntryKind.Winlogon, EntryKind.WindowsLoad, EntryKind.ActiveSetup,
+            EntryKind.RunOnce, EntryKind.RunServices, EntryKind.PolicyRun, EntryKind.Winlogon, EntryKind.WindowsLoad, EntryKind.ActiveSetup,
             EntryKind.TerminalServerRun, EntryKind.BootExecute, EntryKind.ImageHijack, EntryKind.AppInitDll, EntryKind.WmiSubscription,
         ]),
     ];
