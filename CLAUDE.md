@@ -11,6 +11,8 @@ dotnet run --project src/AutoRunManager       # run the app
 dotnet format src --verify-no-changes         # check formatting against src/.editorconfig
 src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --list <file.tsv>   # dump all entries as TSV, no window
 src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --preview-unelevated   # UI as a non-elevated process shows it
+.\tools\publish.ps1 [-InstallDir <folder>]    # release single-file exe to publish\ (not trimmed: COM and WMI)
+.\tools\make-icon.ps1                         # regenerate src/AutoRunManager/AutoRunManager.ico
 ```
 
 `--list` runs the same collector as the window and is the quickest way to check sources against the real machine (start it with `Start-Process -Wait`; it is a WinExe and prints nothing to the console).
