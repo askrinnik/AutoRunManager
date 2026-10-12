@@ -11,6 +11,8 @@
     <!-- Needed by LibraryImport-generated marshalling. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Regenerate with tools/make-icon.ps1. -->
+    <ApplicationIcon>AutoRunManager.ico</ApplicationIcon>
     <Version>0.1.0</Version>
     <Product>AutoRunManager</Product>
     <Description>Shows and manages the places where Windows starts apps and services automatically.</Description>

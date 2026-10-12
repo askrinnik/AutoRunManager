@@ -89,4 +89,4 @@ The prototype is plain PowerShell building WPF from code (no embedded C#). Defec
 5. Actions: toggle, delete with backup; admin-rights detection per entry. **Done.** Verified on the machine with test entries only (HKCU Run value, user Startup file, user task): toggle, delete, backup, restore of the `.reg` backup. Not verified on the machine: Store app toggle, service start type change, WMI deletion.
 6. WPF UI port of the prototype design; async loading. **Done.** Tabs, search and filter as decided; checked with screenshots.
 7. Elevation: disabled controls, "Restart as administrator". **Done.** Checked only with `--preview-unelevated`: UAC is off on the development machine.
-8. Manual check on the real machine with test entries only; publish script, icon, README.
+8. Manual check on the real machine with test entries only; publish script, icon, README. **Done** except the user's own check of the window.

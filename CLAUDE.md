@@ -35,6 +35,7 @@ UAC is off on this machine (`EnableLUA = 0`): every process of the user is eleva
   - `Services/`: `IconLoader` (`SHGetFileInfo`, cached), `ShellLauncher` (regedit at the key, Explorer select, taskschd.msc, services.msc, Settings startup page, restart elevated).
   - `MainWindow`: tabs from `Core/Presentation/EntryTabs`, search (Ctrl+F), F5 reloads.
 - `src/AutoRunManager.Core.Tests`: xUnit tests with fake platform interfaces.
+- `tools/`: `publish.ps1` (framework-dependent single-file win-x64; `-InstallDir` copies the exe, stopping a running copy), `make-icon.ps1` (power symbol in the accent color).
 - `prototype/AutoRun.Resources.AutoRun.ps1`: working PowerShell/WPF prototype. Reference for look and behavior; not built or shipped.
 
 ## Conventions
