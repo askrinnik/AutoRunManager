@@ -16,7 +16,7 @@ A Windows app that shows everything that starts automatically and lets you turn 
 
 A Windows 11 app that lists every place where Windows starts apps and services automatically: the Run keys, Startup folders and Store app startup tasks that Task Manager shows, plus scheduled tasks, services and the less visible launch points (RunOnce, policies, Winlogon, Active Setup, image hijacks, BootExecute, AppInit_DLLs, WMI subscriptions). Entries can be turned off and on, deleted (after a backup) or opened where they are defined.
 
-It is a C# port of a PowerShell/WPF script (`prototype/`), keeping its look and fixing its defects. Details: [`docs/design.md`](docs/design.md).
+It is a C# port of a PowerShell/WPF script, keeping its look and fixing its defects. Details: [`docs/design.md`](docs/design.md).
 
 ## Using it
 
@@ -57,7 +57,6 @@ src/AutoRunManager/             WPF app (WinExe)
 src/AutoRunManager.Core.Tests/  xUnit tests for Core
 tools/                          publish.ps1, make-icon.ps1
 docs/design.md                  Requirements, autostart locations, decisions, roadmap
-prototype/                      Original PowerShell script (reference only)
 ```
 
 ## License

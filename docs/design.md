@@ -2,7 +2,7 @@
 
 ## Goal
 
-A WPF app (.NET 10) that shows every place where Windows 11 starts apps and services automatically and lets the user turn entries off and on, delete them, or jump to where they are defined. It replaces the PowerShell prototype `prototype/AutoRun.Resources.AutoRun.ps1`: same look and interaction, fixed bugs, more autostart locations.
+A WPF app (.NET 10) that shows every place where Windows 11 starts apps and services automatically and lets the user turn entries off and on, delete them, or jump to where they are defined. It replaces a third-party PowerShell prototype (`AutoRun.Resources.AutoRun.ps1`, kept locally in `prototype/`, not published): same look and interaction, fixed bugs, more autostart locations.
 
 ## Requirements
 

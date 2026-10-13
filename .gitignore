@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Original PowerShell prototype by a third party: local reference only, not published
+prototype/

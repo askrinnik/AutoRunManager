@@ -1,6 +1,6 @@
 # AutoRunManager
 
-Windows 11 app (.NET 10, WPF) that shows every place where Windows starts apps and services automatically and lets the user turn entries off and on, delete them, or open their location. Port of the PowerShell prototype in `prototype/`. Requirements, autostart locations, decisions, open questions, roadmap: `docs/design.md`. Read it before starting a task.
+Windows 11 app (.NET 10, WPF) that shows every place where Windows starts apps and services automatically and lets the user turn entries off and on, delete them, or open their location. Port of a third-party PowerShell prototype kept locally in `prototype/` (git-ignored, not published). Requirements, autostart locations, decisions, open questions, roadmap: `docs/design.md`. Read it before starting a task.
 
 ## Commands
 
@@ -39,7 +39,7 @@ UAC is off on this machine (`EnableLUA = 0`): every process of the user is eleva
 - `src/AutoRunManager.Core.Tests`: xUnit tests with fake platform interfaces.
 - `.github/workflows/ci.yml`: CI on `windows-latest` for pushes and pull requests to `main`: restore, format check (`dotnet format --verify-no-changes`), build (Release), test.
 - `tools/`: `publish.ps1` (framework-dependent single-file win-x64; `-InstallDir` copies the exe, stopping a running copy), `make-icon.ps1` (power symbol in the accent color).
-- `prototype/AutoRun.Resources.AutoRun.ps1`: working PowerShell/WPF prototype. Reference for look and behavior; not built or shipped.
+- `prototype/AutoRun.Resources.AutoRun.ps1`: working PowerShell/WPF prototype. Reference for look and behavior; not built or shipped. Third-party code: git-ignored, exists only on the development machine; never commit it.
 
 ## Conventions
 
