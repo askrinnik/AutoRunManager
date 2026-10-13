@@ -10,6 +10,7 @@ A Windows app that shows everything that starts automatically and lets you turn 
 [![Release](https://img.shields.io/github/v/release/askrinnik/AutoRunManager)](https://github.com/askrinnik/AutoRunManager/releases/latest)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D4)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/download/dotnet/10.0)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 </div>
 
@@ -58,3 +59,7 @@ tools/                          publish.ps1, make-icon.ps1
 docs/design.md                  Requirements, autostart locations, decisions, roadmap
 prototype/                      Original PowerShell script (reference only)
 ```
+
+## License
+
+[MIT](LICENSE)
