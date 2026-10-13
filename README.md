@@ -18,6 +18,21 @@ A Windows 11 app that lists every place where Windows starts apps and services a
 
 It is a C# port of a PowerShell/WPF script, keeping its look and fixing its defects. Details: [`docs/design.md`](docs/design.md).
 
+<p align="center">
+  <img src="docs/screenshots/apps.png" width="820" alt="AutoRunManager window: side navigation with Apps, Tasks, Services and Advanced; Registry and Startup folders entries with scope tags (HKCU, HKLM, HKLM 32-bit, User, All users), on/off switches and delete buttons">
+</p>
+
+<details>
+<summary>More screenshots: Tasks, Services, Advanced</summary>
+
+<img src="docs/screenshots/tasks.png" width="820" alt="Tasks: scheduled tasks tagged by whom they run as (System, User, All users)">
+<img src="docs/screenshots/services.png" width="820" alt="Services: non-Windows services with switches that set the start type">
+<img src="docs/screenshots/advanced.png" width="820" alt="Advanced: Winlogon, Active Setup and BootExecute entries, read-only">
+
+</details>
+
+The screenshots show made-up entries (`AutoRunManager.exe --screenshots <folder>`), not a real machine.
+
 ## Using it
 
 - Side navigation: **Apps** (what Task Manager shows) with Registry, Startup folders and Store apps; **Tasks**; **Services**; **Advanced** (other launch points). Search (Ctrl+F) looks through all groups; filter by On / Off / Needs admin, reload with F5.
@@ -55,8 +70,9 @@ src/                            Self-contained C# solution: AutoRunManager.slnx,
 src/AutoRunManager.Core/        Model, parsing helpers, autostart sources, actions; no UI
 src/AutoRunManager/             WPF app (WinExe)
 src/AutoRunManager.Core.Tests/  xUnit tests for Core
-tools/                          publish.ps1, make-icon.ps1
+tools/                          publish.ps1, make-icon.ps1, make-docs-images.ps1
 docs/design.md                  Requirements, autostart locations, decisions, roadmap
+docs/screenshots/               README screenshots (made-up entries); docs/social-preview.png: GitHub social preview
 ```
 
 ## License

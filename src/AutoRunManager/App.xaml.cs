@@ -11,9 +11,17 @@ namespace AutoRunManager;
 
 public partial class App : Application
 {
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // --screenshots <folder>: render the window with made-up entries to PNG files and exit (README images).
+        if (e.Args is ["--screenshots", string folder])
+        {
+            await Screenshots.ScreenshotRenderer.RenderAsync(folder);
+            Shutdown();
+            return;
+        }
 
         // --list <file>: write all entries as tab-separated text and exit (diagnostics, no window).
         if (e.Args is ["--list", string file])

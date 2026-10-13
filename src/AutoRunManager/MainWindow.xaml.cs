@@ -17,14 +17,27 @@ public partial class MainWindow : Window
     private readonly GradientStop _bottomStop = new(Colors.Black, 1.0);
     private readonly MainViewModel _model;
     private readonly AppState _state;
+    private readonly bool _rememberBounds;
+    private readonly TaskCompletionSource _firstLoad = new();
     private bool _closing;
 
     public MainWindow(bool elevated, AppState state)
+        : this(elevated, state, EntryCollector.CreateDefault, rememberBounds: true)
+    {
+    }
+
+    /// <param name="rememberBounds">Whether to use and save the window bounds in <paramref name="state"/>; off for screenshots.</param>
+    internal MainWindow(bool elevated, AppState state, Func<EntryCollector> createCollector, bool rememberBounds)
     {
         InitializeComponent();
         _state = state;
-        ApplySavedBounds(state.Window);
-        _model = new MainViewModel(new WindowDialogs(this), EntryCollector.CreateDefault, EntryActions.CreateDefault(state), elevated);
+        _rememberBounds = rememberBounds;
+        if (rememberBounds)
+        {
+            ApplySavedBounds(state.Window);
+        }
+
+        _model = new MainViewModel(new WindowDialogs(this), createCollector, EntryActions.CreateDefault(state), elevated);
         DataContext = _model;
 
         EntriesScroll.OpacityMask = new LinearGradientBrush(
@@ -35,7 +48,11 @@ public partial class MainWindow : Window
         InputBindings.Add(new KeyBinding(new RelayCommand(() => SearchBox.Focus()), Key.F, ModifierKeys.Control));
         InputBindings.Add(new KeyBinding(_model.RefreshCommand, Key.F5, ModifierKeys.None));
         WindowEffects.FadeIn(this);
-        Loaded += async (_, _) => await _model.LoadAsync();
+        Loaded += async (_, _) =>
+        {
+            await _model.LoadAsync();
+            _firstLoad.TrySetResult();
+        };
         _model.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(MainViewModel.SelectedNavigation) or nameof(MainViewModel.SelectedFilter) or nameof(MainViewModel.SearchText))
@@ -45,9 +62,19 @@ public partial class MainWindow : Window
         };
     }
 
+    internal MainViewModel Model => _model;
+
+    /// <summary>Completes when the entries have been read for the first time.</summary>
+    internal Task FirstLoad => _firstLoad.Task;
+
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
         base.OnClosing(e);
+        if (!_rememberBounds)
+        {
+            return;
+        }
+
         Rect bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
         _state.Window = new WindowBounds(bounds.Left, bounds.Top, bounds.Width, bounds.Height);
         try

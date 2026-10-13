@@ -13,6 +13,7 @@ src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --list <file.tsv
 src\AutoRunManager\bin\Debug\net10.0-windows\AutoRunManager.exe --preview-unelevated   # UI as a non-elevated process shows it
 .\tools\publish.ps1 [-InstallDir <folder>]    # release single-file exe to publish\ (not trimmed: COM and WMI)
 .\tools\make-icon.ps1                         # regenerate src/AutoRunManager/AutoRunManager.ico
+.\tools\make-docs-images.ps1                  # regenerate docs/screenshots/*.png (made-up entries) and docs/social-preview.png
 ```
 
 `--list` runs the same collector as the window and is the quickest way to check sources against the real machine (start it with `Start-Process -Wait`; it is a WinExe and prints nothing to the console).
@@ -35,10 +36,11 @@ UAC is off on this machine (`EnableLUA = 0`): every process of the user is eleva
   - `ViewModels/`: `MainViewModel` (load off the UI thread, navigation, search across all groups, filter, toggle, delete, toggle a whole section), `EntryViewModel`, `SectionViewModel`, `AsyncCommand`.
   - `Dialogs/`: `DialogWindow` (confirm/message in the prototype style), `WindowEffects` (fades).
   - `Services/`: `IconLoader` (`SHGetFileInfo`, cached), `ShellLauncher` (regedit at the key, Explorer select, taskschd.msc, services.msc, Settings startup page, restart elevated).
+  - `Screenshots/`: `DemoSource` (made-up entries with a fake `SystemContext`), `ScreenshotRenderer` (`--screenshots <folder>`: renders the window off screen, one PNG per navigation group, and exits; window bounds are neither used nor saved).
   - `MainWindow`: side navigation from `Core/Presentation/EntryTabs`, search (Ctrl+F), F5 reloads; resizable (WindowChrome); bounds saved in `AutoRunManager.state.json` on close.
 - `src/AutoRunManager.Core.Tests`: xUnit tests with fake platform interfaces.
 - `.github/workflows/ci.yml`: CI on `windows-latest` for pushes and pull requests to `main`: restore, format check (`dotnet format --verify-no-changes`), build (Release), test.
-- `tools/`: `publish.ps1` (framework-dependent single-file win-x64; `-InstallDir` copies the exe, stopping a running copy), `make-icon.ps1` (power symbol in the accent color).
+- `tools/`: `publish.ps1` (framework-dependent single-file win-x64; `-InstallDir` copies the exe, stopping a running copy), `make-icon.ps1` (power symbol in the accent color), `make-docs-images.ps1` (README screenshots through `--screenshots`, social preview 1280x640 to upload in the repository settings).
 - `prototype/AutoRun.Resources.AutoRun.ps1`: working PowerShell/WPF prototype. Reference for look and behavior; not built or shipped. Third-party code: git-ignored, exists only on the development machine; never commit it.
 
 ## Conventions
