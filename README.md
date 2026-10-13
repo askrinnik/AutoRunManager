@@ -1,4 +1,17 @@
+<div align="center">
+
+<img src="docs/icon.png" width="96" alt="">
+
 # AutoRunManager
+
+A Windows app that shows everything that starts automatically and lets you turn it off.
+
+[![CI](https://github.com/askrinnik/AutoRunManager/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/askrinnik/AutoRunManager/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/askrinnik/AutoRunManager)](https://github.com/askrinnik/AutoRunManager/releases/latest)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D4)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/download/dotnet/10.0)
+
+</div>
 
 A Windows 11 app that lists every place where Windows starts apps and services automatically: the Run keys, Startup folders and Store app startup tasks that Task Manager shows, plus scheduled tasks, services and the less visible launch points (RunOnce, policies, Winlogon, Active Setup, image hijacks, BootExecute, AppInit_DLLs, WMI subscriptions). Entries can be turned off and on, deleted (after a backup) or opened where they are defined.
 
