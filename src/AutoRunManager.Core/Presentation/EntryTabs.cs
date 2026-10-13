@@ -94,8 +94,8 @@ public static class EntryQuery
 {
     /// <summary>
     /// Filter: On = enabled or always active, Off = disabled, NeedsAdmin = changing it needs
-    /// elevation. Search: case-insensitive substring of name, command, location or details; all
-    /// words must match.
+    /// elevation. Search: case-insensitive substring of name, command, location, details, section
+    /// or scope tag ("all users", "32-bit"); all words must match.
     /// </summary>
     public static bool Matches(StartupEntry entry, EntryFilter filter, string? search)
     {
@@ -116,7 +116,7 @@ public static class EntryQuery
             return true;
         }
 
-        string haystack = string.Join('\n', entry.Name, entry.Command, entry.Locator.Display, entry.Details ?? "", entry.Kind.DisplayName());
+        string haystack = string.Join('\n', entry.Name, entry.Command, entry.Locator.Display, entry.Details ?? "", entry.Kind.DisplayName(), entry.Scope ?? "");
         return search.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .All(word => haystack.Contains(word, StringComparison.OrdinalIgnoreCase));
     }

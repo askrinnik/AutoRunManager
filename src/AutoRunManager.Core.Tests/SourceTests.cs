@@ -324,9 +324,9 @@ public class EntryCollectorTests
     {
         FakeRegistry registry = new FakeRegistry().Set(RegistryHive.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", "App", "app.exe");
 
-        CollectResult result = new EntryCollector([new ThrowingSource(), new RunKeySource(registry)]).Collect();
+        CollectResult result = new EntryCollector([new ThrowingSource(), new RunKeySource(registry)], TestContext.Default).Collect();
 
-        Assert.Single(result.Entries);
+        Assert.Equal("HKCU", Assert.Single(result.Entries).Scope);
         Assert.Equal(["Broken: boom"], result.Errors);
     }
 }

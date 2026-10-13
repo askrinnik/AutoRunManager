@@ -44,7 +44,7 @@ public static class EntryKindExtensions
     public static string DisplayName(this EntryKind kind) => kind switch
     {
         EntryKind.RunKey => "Registry",
-        EntryKind.StartupFolder => "Startup folder",
+        EntryKind.StartupFolder => "Startup folders",
         EntryKind.PackagedApp => "Store apps",
         EntryKind.ScheduledTask => "Task Scheduler",
         EntryKind.Service => "Services",

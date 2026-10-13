@@ -41,6 +41,9 @@ public sealed class EntryViewModel : ObservableObject
 
     public string Name => _entry.Name;
 
+    /// <summary>Scope tag (User, All users, HKCU, HKLM, HKLM 32-bit); null hides the tag.</summary>
+    public string? Scope => _entry.Scope;
+
     public string PathText => _entry.Command.Replace("\"", "");
 
     public bool IsEnabled => _entry.IsEnabled;

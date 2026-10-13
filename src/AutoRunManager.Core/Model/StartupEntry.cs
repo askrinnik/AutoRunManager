@@ -29,6 +29,9 @@ public sealed record StartupEntry(
     bool RequiresAdmin,
     string? Details = null)
 {
+    /// <summary>Scope tag shown on the card and searched (<c>User</c>, <c>HKLM 32-bit</c>, ...); set by the collector.</summary>
+    public string? Scope { get; init; }
+
     public string Id => $"{Kind}|{Locator.Display}";
 
     public bool IsEnabled => State != EntryState.Disabled;

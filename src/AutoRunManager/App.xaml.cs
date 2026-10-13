@@ -32,11 +32,11 @@ public partial class App : Application
     {
         CollectResult result = EntryCollector.CreateDefault().Collect();
         StringBuilder text = new();
-        text.AppendLine("Kind\tState\tName\tCanToggle\tCanDelete\tAdmin\tExecutable\tCommand\tLocation\tDetails");
+        text.AppendLine("Kind\tScope\tState\tName\tCanToggle\tCanDelete\tAdmin\tExecutable\tCommand\tLocation\tDetails");
         foreach (StartupEntry entry in result.Entries)
         {
             text.AppendJoin('\t',
-                entry.Kind, entry.State, entry.Name, entry.CanToggle, entry.CanDelete, entry.RequiresAdmin,
+                entry.Kind, entry.Scope, entry.State, entry.Name, entry.CanToggle, entry.CanDelete, entry.RequiresAdmin,
                 entry.ExecutablePath, entry.Command, entry.Locator.Display, entry.Details?.ReplaceLineEndings(" | "));
             text.AppendLine();
         }

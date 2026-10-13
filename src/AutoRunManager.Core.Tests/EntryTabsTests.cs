@@ -78,4 +78,23 @@ public class EntryTabsTests
 
         Assert.Equal(expected, actual);
     }
+
+    [Theory]
+    [InlineData("all users", "Common")]
+    [InlineData("32-bit", "Legacy")]
+    [InlineData("hklm", "Legacy")]
+    [InlineData("user", "Mine,Common")]
+    public void Matches_SearchesScopeTag(string search, string expected)
+    {
+        StartupEntry[] entries =
+        [
+            Entry(EntryKind.StartupFolder, "Mine") with { Scope = "User" },
+            Entry(EntryKind.StartupFolder, "Common") with { Scope = "All users" },
+            Entry(EntryKind.RunKey, "Legacy") with { Scope = "HKLM 32-bit" },
+        ];
+
+        string actual = string.Join(',', entries.Where(e => EntryQuery.Matches(e, EntryFilter.All, search)).Select(e => e.Name));
+
+        Assert.Equal(expected, actual);
+    }
 }

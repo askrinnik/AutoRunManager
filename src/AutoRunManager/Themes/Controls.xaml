@@ -92,6 +92,20 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Small scope tag next to an entry name (User, All users, HKCU, HKLM, HKLM 32-bit); hidden without a scope. -->
+    <Style x:Key="ScopeTag" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource IconBackgroundBrush}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="7,1,7,2" />
+        <Setter Property="Margin" Value="8,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Scope}" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="HeaderGlyph" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}" />
         <Setter Property="Cursor" Value="Hand" />

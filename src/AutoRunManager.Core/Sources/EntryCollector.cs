@@ -1,12 +1,16 @@
 using AutoRunManager.Core.Model;
 using AutoRunManager.Core.Platform;
+using AutoRunManager.Core.Presentation;
 
 namespace AutoRunManager.Core.Sources;
 
 public sealed record CollectResult(IReadOnlyList<StartupEntry> Entries, IReadOnlyList<string> Errors);
 
-/// <summary>Runs all sources; a failing source is reported, the others still contribute.</summary>
-public sealed class EntryCollector(IReadOnlyList<IEntrySource> sources)
+/// <summary>
+/// Runs all sources and sets the scope tag of each entry; a failing source is reported, the others
+/// still contribute.
+/// </summary>
+public sealed class EntryCollector(IReadOnlyList<IEntrySource> sources, SystemContext context)
 {
     public static EntryCollector CreateDefault()
     {
@@ -23,7 +27,7 @@ public sealed class EntryCollector(IReadOnlyList<IEntrySource> sources)
             new ServiceSource(registry, strings, context),
             new RegistryLaunchPointSource(registry, context),
             new WmiSubscriptionSource(new WmiSubscriptions()),
-        ]);
+        ], context);
     }
 
     public IReadOnlyList<IEntrySource> Sources => sources;
@@ -36,7 +40,7 @@ public sealed class EntryCollector(IReadOnlyList<IEntrySource> sources)
         {
             try
             {
-                entries.AddRange(source.Enumerate());
+                entries.AddRange(source.Enumerate().Select(e => e with { Scope = EntryScope.Tag(e, context) }));
             }
             catch (Exception e)
             {
