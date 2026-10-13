@@ -101,7 +101,8 @@ public sealed class ComTaskScheduler : ITaskScheduler
                 triggers,
                 (string?)definition.Principal.UserId,
                 (string?)definition.RegistrationInfo.Author,
-                (string?)definition.RegistrationInfo.Description);
+                (string?)definition.RegistrationInfo.Description,
+                (string?)definition.Principal.GroupId);
         }
         catch (COMException)
         {

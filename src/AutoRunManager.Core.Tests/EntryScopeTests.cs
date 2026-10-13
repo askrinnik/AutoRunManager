@@ -43,4 +43,32 @@ public class EntryScopeTests
         Assert.Null(Tag(EntryKind.Service, new ServiceLocator("VendorSvc")));
         Assert.Null(Tag(EntryKind.WmiSubscription, new WmiSubscriptionLocator("f", "c", "b")));
     }
+
+    [Fact]
+    public void Tag_KeepsTaskScopeSetBySource()
+    {
+        StartupEntry task = Entry(EntryKind.ScheduledTask, new ScheduledTaskLocator(@"\Vendor\Updater")) with { Scope = "System" };
+
+        Assert.Equal("System", EntryScope.Tag(task, TestContext.Default));
+    }
+
+    [Theory]
+    [InlineData(@"PC\me", null, "User")]
+    [InlineData("me", null, "User")]
+    [InlineData("S-1-5-21-1-2-3-1001", null, "User")]
+    [InlineData("SYSTEM", null, "System")]
+    [InlineData(@"NT AUTHORITY\SYSTEM", null, "System")]
+    [InlineData("S-1-5-18", null, "System")]
+    [InlineData(@"NT AUTHORITY\LOCAL SERVICE", null, "System")]
+    [InlineData("S-1-5-20", null, "System")]
+    [InlineData(@"PC\Admin", null, "Admin")]
+    [InlineData(null, "Users", "All users")]
+    [InlineData("", @"BUILTIN\Users", "All users")]
+    [InlineData(null, "S-1-5-32-545", "All users")]
+    [InlineData(null, "Administrators", "Administrators")]
+    [InlineData(null, null, null)]
+    public void TaskTag_NamesWhomTheTaskRunsAs(string? userId, string? groupId, string? expected)
+    {
+        Assert.Equal(expected, EntryScope.TaskTag(userId, groupId, TestContext.Default));
+    }
 }

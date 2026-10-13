@@ -6,6 +6,7 @@ public sealed record TaskAction(string? Program, string? Arguments, string? ComC
 /// <param name="Path">Full task path, e.g. <c>\Vendor\Updater</c>.</param>
 /// <param name="Triggers">Readable trigger descriptions ("At logon", "At startup", ...).</param>
 /// <param name="UserId">Principal the task runs as, as stored in the definition.</param>
+/// <param name="GroupId">Group principal (e.g. <c>Users</c>) when the task runs for every logged-on member instead of one user.</param>
 public sealed record ScheduledTaskInfo(
     string Path,
     string Name,
@@ -14,7 +15,8 @@ public sealed record ScheduledTaskInfo(
     IReadOnlyList<string> Triggers,
     string? UserId,
     string? Author,
-    string? Description);
+    string? Description,
+    string? GroupId = null);
 
 public interface ITaskScheduler
 {

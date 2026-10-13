@@ -1,6 +1,7 @@
 using AutoRunManager.Core.Model;
 using AutoRunManager.Core.Parsing;
 using AutoRunManager.Core.Platform;
+using AutoRunManager.Core.Presentation;
 
 using Microsoft.Win32;
 
@@ -32,7 +33,10 @@ public sealed class ScheduledTaskSource(ITaskScheduler scheduler, IRegistry regi
                 CanToggle: true,
                 CanDelete: true,
                 RequiresAdmin: !context.IsCurrentUser(task.UserId),
-                Details: Describe(task));
+                Details: Describe(task))
+            {
+                Scope = EntryScope.TaskTag(task.UserId, task.GroupId, context),
+            };
         }
     }
 
@@ -66,6 +70,10 @@ public sealed class ScheduledTaskSource(ITaskScheduler scheduler, IRegistry regi
         if (!string.IsNullOrEmpty(task.UserId))
         {
             parts.Add("Runs as: " + task.UserId);
+        }
+        else if (!string.IsNullOrEmpty(task.GroupId))
+        {
+            parts.Add("Runs for group: " + task.GroupId);
         }
 
         if (!string.IsNullOrWhiteSpace(task.Description))

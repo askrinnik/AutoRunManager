@@ -235,6 +235,17 @@ public class ScheduledTaskSourceTests
     }
 
     [Fact]
+    public void Enumerate_SetsScopeFromPrincipal()
+    {
+        FakeTaskScheduler scheduler = new(Task(@"\Mine"), Task(@"\Sys", "SYSTEM"), Task(@"\Group", null) with { GroupId = "Users" });
+
+        List<StartupEntry> entries = new ScheduledTaskSource(scheduler, new FakeRegistry(), TestContext.Default).Enumerate().ToList();
+
+        Assert.Equal(["User", "System", "All users"], entries.Select(e => e.Scope));
+        Assert.Contains("Runs for group: Users", entries[2].Details);
+    }
+
+    [Fact]
     public void Enumerate_ResolvesComHandlerServer()
     {
         const string clsid = "{11111111-2222-3333-4444-555555555555}";
