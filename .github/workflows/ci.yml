@@ -27,6 +27,9 @@ jobs:
       - name: Restore
         run: dotnet restore src
 
+      - name: Check formatting
+        run: dotnet format src --verify-no-changes --no-restore
+
       - name: Build
         run: dotnet build src --no-restore -c Release
 
